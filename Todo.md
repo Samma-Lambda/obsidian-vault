@@ -27,4 +27,3 @@ Notes for NLP meeting:
 
 [[NLP Write up]]
 
-[[Stats HW  7]]
