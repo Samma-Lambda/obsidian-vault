@@ -23,8 +23,7 @@ Responsibilities:
 - Add up sustainability score and then see how if does for high vs low
 
 Notes for NLP meeting:
-Hypothesis tested for both binary classification and continuous classification and both p values came back extremely significantly for top sustainability statements vs bottom. 
-But came back significant in the other direction
+- what were the top ones picked using(combined score missing for KPN,Amazon time sustain score missing), for the time being omitted KPN,Qualcom,Rexel,telus
 
 [[NLP Write up]]
 
