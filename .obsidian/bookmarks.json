@@ -1,0 +1,53 @@
+{
+  "items": [
+    {
+      "type": "graph",
+      "ctime": 1764899764674,
+      "title": "Good Graph",
+      "options": {
+        "collapse-filter": false,
+        "search": "",
+        "showTags": false,
+        "showAttachments": false,
+        "hideUnresolved": false,
+        "showOrphans": true,
+        "collapse-color-groups": true,
+        "colorGroups": [
+          {
+            "query": "Pure",
+            "color": {
+              "a": 1,
+              "rgb": 5990139
+            }
+          },
+          {
+            "query": "Computer",
+            "color": {
+              "a": 1,
+              "rgb": 1009440
+            }
+          },
+          {
+            "query": "Applied",
+            "color": {
+              "a": 1,
+              "rgb": 14701138
+            }
+          }
+        ],
+        "collapse-display": false,
+        "showArrow": false,
+        "textFadeMultiplier": -3,
+        "nodeSizeMultiplier": 1.09690755208333,
+        "lineSizeMultiplier": 5,
+        "collapse-forces": false,
+        "centerStrength": 1,
+        "repelStrength": 20,
+        "linkStrength": 1,
+        "linkDistance": 30,
+        "scale": 1.3115205626095112,
+        "close": false
+      }
+    }
+  ]
+}

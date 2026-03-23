@@ -1,0 +1,14 @@
+I am a third-year student at Willamette University pursuing degrees in Computer Science, Data Science, and Mathematics. After completing my undergraduate studies, I plan to pursue a PhD in cryptography, number theory, or quantum algorithms. Because Willamette is a low-research institution, I am applying to this program both to gain the experience necessary to be a competitive graduate applicant and because I would genuinely love to spend my summer studying cryptography and coding theory.
+
+To prepare for graduate research, I have developed a strong mathematical foundation through coursework and prior research experiences, which I believe align well with the areas of study in this research program. I am currently taking Abstract Algebra V, where we have been studying algebraic number theory and tensors. I have also taken courses in number theory, topology, probability, stochastic processes, and linear algebra.
+
+In addition to formal coursework, I have explored quantum computing through independent study. I worked through _Quantum Computing Explained_ by David McMahon and implemented its algorithms in Python, specifically the Deutsch Josza, Quantum Fourier Transform, Phase Estimation, and Shor’s algorithms. I did this using only NumPy, representing qubits and quantum gates as vectors and matrices, and applying them to multiple qubits using the Kronecker product. This project is publicly available on my GitHub, with each algorithm accompanied by a written explanation in the Jupyter notebook. It remains one of my favorite personal projects to date.
+
+Aside from quantum computing simulations, I have also enjoyed implementing cryptographic algorithms in my free time. For my final project in my number theory course, I wrote a seven-page primer on ECC and implemented both the symmetric and asymmetric schemes in Python. I enjoyed it so much that the following summer I went on to implement two more cryptographic algorithms, RSA and lattice-based encryption. All of these projects are listed on my resume.
+
+While cryptography is a field with many lucrative applications, I am not motivated by money to pursue this work. I am drawn to it because it uses both deep theoretical mathematics and computer based optimizations in a real world setting. I find it incredibly charming that people can communicate securely using points on strangely shaped curves or with objects defined in n dimensional lattices. Implementing these algorithms is challenging, and understanding them is even more challenging, but I genuinely enjoy the process.
+
+Thank you for your time and consideration. I would love to be a part of this program.
+
+Sincerely,  
+Sam Holmes

@@ -1,0 +1,101 @@
+---
+tags:
+---
+#domain 
+This is the study of how probability can lead to computational advantages
+# Chapter 1: Introduction to Probability 
+In this chapter they introduce basic concepts like the axioms of probability, bayes rule and LOTP. I don't feel the need to go into detail 
+
+## Theta Notation 
+Given a function $g$ and $f$ we would say that $f$ is in $\Theta(g)$ if there exists some $c_1,c_2,n_0 \in\mathbb{R}$ such that $c_1 g(n)\leq f(n) \leq c_2 g(n)$ for all $n\geq n_0$. This can be though of as an exact time complexity rather than a upper or lower bound. Conceptually and definitionally this is a set of functions 
+
+## Big O notation
+Given a function $g$ and $f$ we would say that $f$ is $O(g)$ if there exists some $c,n_0 \in\mathbb{R}$ such that $f(n) \leq c g(n)$ for all $n\geq n_0$. This can be though of as an upper bound of the function. Conceptually and definitionally this is a set of functions 
+
+## Little O notation 
+Given a function $g$ and $f$ we would say that $f$ is $o(g)$ if there exists some $c,n_0 \in\mathbb{R}$ such that $f(n) < c g(n)$ for all $n\geq n_0$
+
+
+## Polynomial Equality Verification
+Given two polynomials one factored(in the form of $g(x)=(x-a_1)(x-a_2)...(x-a_n)$) and one in canonical form($f(x)=b_1x^d+b_2x^{d-1}+...+b_n$). To deterministically solve this we would have to factor out the factored form which would take $\Theta(d^2)$ multiplication operations.
+But we can actually solve this non-deterministically, using the fact that if $f(x)=g(x)$ then $f(x)-g(x)=0$. Thus if we plug in some value $\alpha$ and we get $f(\alpha )\neq g(\alpha)$ then we know the polynomials are not equal.
+Additionally since polynomials are closed under addition, we know that $f(x)-g(x)$ is a polynomial with degree at most $d$, meaning that it has at most $d$ real roots. 
+Thus if we create the set $\{0,1,...,100d\}$ there are at most $d$ roots in this set, meaning that the probability or randomly selecting a root is $\frac{1}{100}$ 
+If we have some randomly selected value $\alpha$, we can find the value of $f(\alpha)$ and $g(\alpha)$ with time complexity $O(d)$. If we find that $f(\alpha)\neq g(\alpha)$ then we return false, if $f(\alpha)=g(\alpha)$ then we can try another random value if we want, or if we have done enough trials we can conclude that $f(x)=g(x)$ 
+If we test $c$ of these values we have a probability of less than $(\frac{1}{100})^c$ of returning the wrong answer with a time complexity of $\Theta(cd)$. Its important to note that if $c=d$ then $\Theta(cd)=\Theta(d^2)$  
+
+
+## Matrix Equality Verification
+Given three matrices $A,B,C\in M_{n\times n}(\mathbb{Z}/2)$ we want to be able to verify wether $AB=C$. If we were to find this using matrix multiplication it would take roughly $\Theta(n^3)$ operations.
+But similarly to the polynomial equality verification if $AB=C$ then for all vectors $r$ $ABr=Cr$. 
+We can compute $ABr$ as $A(Br)$ with a time complexity of $\Theta(n^2)$.
+Let $D=AB-C$ and assume that $D\neq 0$ thus there exists at least one element in $D$ that is non-zero, arbitrarily named $d_{11}$.
+We we create a uniformly random vector $r$(filled with ones and zeros) if $Dr\neq 0$ then we return false, if $Dr=0$ then we know that $\Sigma_{j=1}^n d_{1j}r_j=0$ which can be rewritten into $r_1 = -\frac{\Sigma_{j=2}^{n}d_{1j}r_j}{d_{11}}$ the left side either takes a value $0$ or $1$ and the $r_1$ has a 50% chance of taking on that value.
+Thus our algorithm where we plug in $k$ vectors has a time complexity of $\Theta (kn^2)$ and a probability of failure of $(\frac{1}{2})^k$ 
+
+
+## Min-Cut Algorithm
+For a graph the min cut is the minimal set of edges who's removal result in the graph becoming to disjoint connected components. In order to understand this algorithm you need to know what an edge contraction is, for some edge $\{u,v\}$ we contract it by making $u$ and $v$ into a single vertex with all edges connected to $u$ and $v$ now connected to this new vertex. Two vertexes are allowed to have more than one edge connecting them. 
+The algorithm works by uniformly selecting an edge in the graph, and then contracting it. It does this process $n-2$ times until there are two vertices left. The edges between the final two vertices are the edges for our proposed min-cut. It will always return a cut set but not necessarily the minimum one. 
+We can calculate the probability of it returning the min-cut as follows. Let $C$ be the set of edges that constitute the min-cut.
+Let $E_i$ be the event that at step $i$ the edge contracted was not in $C$ and let $F_i-\bigcap_{j=1}^n E_{j}$. If we can calculate $P(F_{n-2})$ then we have calculated the probability of returning the min cut. First we calculate the $P(F_1)=P(E_1)=1-\frac{2k}{nk}$ we get this because if $|C|=k$ then every single vertex of the graph has at least $k$ edges(otherwise we could just cut the vertex edge away). Thus the graph has at least $\frac{nk}{2}$ edges. Thus $P(E_1)=1-\frac{k}{\frac{nk}{2}}=1-\frac{2k}{nk}=1-\frac{2}{n}$. 
+Then we can calculate $P(E_i|F_{i-1})=1-\frac{k}{k(n-i+1)/2}$ 
+Thus $P(F_{n-2})=P(E_{n-2}\cap F_{n-3})=P(E_{n-2}|F_{n-3})P(F_{n-3})=P(E_{n-2}|F_{n-3})P(E_{n-3}|F_{n-4})...P(F_1)\geq\Pi_{i=1}^{n-2}(1-\frac{2}{n-i+1})$ The final product can be rewritten using $\Pi_{i=1}^{n-2}(\frac{n-i+1}{n-i+1}-\frac{2}{n-i+1})=\Pi_{i=1}^{n-2}(\frac{n-i-1}{n-i+1})=(\frac{n-2}{n})(\frac{n-3}{n-1})(\frac{n-4}{n-2})...(\frac{3}{5})(\frac{2}{4})(\frac{1}{3})=\frac{2}{n(n-1)}$ 
+Thus our probability of getting the min-cut is $\frac{2}{n(n-1)}$ 
+We can run this multiple times we can get a higher chance of getting the min cut, and if we run it $n(n-1)\text{ln}(n)$ times we get $(1-\frac{2}{n(n-1)})^{n(n-1)\text{ln}(n)}$. Using the property that $1-x\leq e^{-x}$ we get
+$(1-\frac{2}{n(n-1)})^{n(n-1)\text{ln}(n)}\leq e^{-\frac{2}{n(n-1)}n(n-1)\text{ln}(n)}=\frac{1}{n^2}$ 
+
+# Chapter 2: Random Variable and Expectations
+In this chapter they introduce random variables and expected value but I am not going explain it because I already know it. 
+## Coupons Collector Problem 
+The coupon collector problem is model for someone trying to collect $n$ distinct objects where each trial you get a uniformly distributed object. To find the expected value of this, we can write the time that it takes to get the final coupon as $1+\text{Geom}(\frac{n-1}{n})+\text{Geom}(\frac{n-2}{n})+...+\text{Geom}(\frac{1}{n})$ which has the expected value is $\Sigma_{i=1}^{n} \frac{n}{n-i+1}=n\Sigma_{i=1}^{n} \frac{1}{n-i+1}=n\Sigma_{i=1}^{n}\frac{1}{i}$. The value of $\Sigma_{i=1}^{n}\frac{1}{i}$ is known as the $n\text{th}$ harmonic number and has a value of $\text{ln}(n)+\Theta(1)$ and thus the coupons collectors problem has an expected value of $n\text{ln}(n)+\Theta(n)$ 
+
+## Expected time of Quick-sort
+The quick sort algorithm runs by doing the following. For some list of distinct elements $S=\{x_1,x_2,...,x_n\}$ it starts by picking some random pivot which we can call $x_{p_1}$ which will act as our pivot. Then it takes all the other elements and then divides the element into two sublists $S_1$ and $S_2$ based off wether $x_i<x_{p_i}$. It then recursively runs on on the two sublists and returns $S_1,x_{p_1},S_2$ which will be sorted
+
+To derive the expected time complexity we define $y_1,...,y_n$ to be the full sorted $x_1,...,x_n$. We define indicator variables $I_{ij}=1$ if element $y_i$ is compared to element $y_j$ with $i<j$. Thus the expected number of comparisons are $\Sigma_{i=1}^{n-1}\Sigma_{j=i+1}^{n}I_{ij}$ and $E[\Sigma_{i=1}^{n-1}\Sigma_{j=i+1}^{n}I_{ij}]=\Sigma_{i=1}^{n-1}\Sigma_{j=i+1}^{n}E[I_{ij}]$ by the linearity of expectations. Thus we just need to find the probability that $I_{ij}=1$ 
+
+We know that $y_i$ and $y_j$ get compared if they are both in the same list(or sublist) and one of them gets selected as the pivot. But it all works out to only matter wether an element between them is selected before one of them are selected. Thus $P(I_{ij}=1)=\frac{2}{j-i+1}=E[I_{ij}]$
+
+Thus $E[X]=\Sigma_{i=1}^{n-1}\Sigma_{j=i+1}^{n}\frac{2}{j-i+1}$ which setting $k=j-i+1$ equals $\Sigma_{i=1}^{n-1}\Sigma_{k=2}^{n-i+1}\frac{2}{k}$ using a change of summation variables(when $j=i+1$ then $k=2$ and when $j=n$ then $k=n-i+1$). We can write this further because looking that the values that $k$ can take we see that $k<n-i+1$ which means that $i<n-k+1$ and that the highest value of $k$ can be achieved when $i=1$ which says $k<n$. Thus we can rewrite out bound as $\Sigma_{k=2}^n \Sigma_{i=1}^{n+1-k}\frac{2}{k}$ which equals $\Sigma_{k=2}^n (n+1-k)\frac{2}{k}$. Next we can rewrite this as $\Sigma_{k=2}^{n}(n+1)\frac{2}{k}-2=2(n+1)\Sigma _{k=2}^{n}\frac{1}{k}-2(n-1)$. We want to write $\Sigma^{n}_{k=2}\frac{1}{k}$ starting from $k=1$ so that it is a harmonic number thus $\Sigma_{k=2}^n\frac{1}{k}=\Sigma_{k=1}^n\frac{1}{k}-1$. Thus when we substitute it in we get $(2n-2)\Sigma_{k=1}^n \frac{1}{k} -4n$ which works out to mean that $E[X]=2n\text{ln}(n)+\Theta(n)$ 
+
+
+# Chapter 3: Moments and Deviations
+This chapter introduces Markov's inequality, Chebyshev's inequality, what a moment of a random variable is $E[X^n]$ and what variance is. These let us get bounds on the chance of something or greater happening 
+## Randomized Median Algorithm 
+This algorithm finds the median of some array of $n$ elements $S$ and returns the median of it. It works by finding two elements in the array $d,u$ such that the median $m$ is between then and there is not many elements between them(specifically $o(n/\text{log}\,n)$). 
+The size allows us to run a standard sorting algorithm with a time complexity of $O(n\, \text{log}\,n)$ and still have the algorithm complete in linear time. This works out to be linear time complexity by setting $n=\frac{m}{\text{log}\,m}$ which makes the complexity $O(\frac{m}{\text{log}\,m} \text{log}\,(\frac{m}{\text{log}\,m}))=O(\frac{m}{\text{log}\,m}(\text{log}\,m - \text{log}\,\text{log}(m)))=O(m-\frac{m\text{log(}\text{log}\,m)}{\text{log}\,m})=O(m-m\frac{\text{log(}\text{log}\,m)}{\text{log}\,m})=O(m)$ Note that $\frac{\text{log(}\text{log}\,m)}{\text{log}\,m}$ is less than $1$ 
+
+So now instead of finding the median we just need to have an algorithm which finds $d$ and $u$. We sample with replacement $\lceil n^{\frac{3}{4}}\rceil$ elements and call this set $R$. We then sort $R$ and select the $\lfloor n^{\frac{3}{4}}/2-\sqrt{n}\rfloor$th element as $d$ and the $\lfloor n^{\frac{3}{4}}/2+\sqrt{n}\rfloor$th element as $u$. When then take all the elements of $S$ and place then in the following sets $l_d=\{x\in S| x\leq d\}$, $C = \{x\in S| d\leq x \leq u\}$ and  $l_c = \{x\in S| u\leq x\}$. If $|l_c| \geq n/2$ or $|l_d| \geq n/2$ FAIL the attempt(This ensures the median is within $C$), additionally if $|C|\geq 4n^{\frac{3}{4}}$ then FAIL the attempt(This ensures that $C$ is sufficiently small). Sort the $C$ and output the $\lfloor\frac{n}{2}\rfloor - l_d +1$ element. 
+
+We know that this will return the incorrect median, only if the median is not in $C$. But we would catch this case if $|l_c| \geq n/2$ or $|l_d| \geq n/2$. Thus if the algorithm returns a value then it is the median.
+
+Thus because the algorithm is always correct when it does not fail. We just need to make a statement about the probability of failure. We see that failure is equivalent to these three events 
+1. $\mathcal{E}_1: |\{r\in R |r\leq m\}|< \frac{1}{2}n^{3/4}-\sqrt{n}$ 
+2. $\mathcal{E}_2: |\{r\in R |r\geq m\}|< \frac{1}{2}n^{3/4}-\sqrt{n}$ 
+3. $\mathcal{E}_3:|C|>4n^{3/4}$
+We know that $\mathcal{E}_1$ is equivalent to $|l_c|\geq n/2$ because of the following proof. 
+$\mathcal{E}_1 \rightarrow |l_c|\geq n/2$
+$\mathcal{E}_1$ means that $d>m$ thus $|l_c|\geq n/2$ by definition of median
+$|l_c|\geq n/2  \rightarrow \mathcal{E}_1$
+If $|l_c|\geq n/2$ then $d>m$ which since we sampled $\lceil n^{\frac{3}{4}}\rceil$ elements and $d$ is the $\lfloor n^{\frac{3}{4}}/2-\sqrt{n}\rfloor$ element there are at least $\lfloor n^{\frac{3}{4}}/2-\sqrt{n}\rfloor$ elements greater than it. Which implies $\mathcal{E}_1$
+
+Now that we need to find $P(\mathcal{E}_1 \cup \mathcal{E}_2 \cup \mathcal{E}_3)$. 
+Finding $\mathcal{E}_1$ and $\mathcal{E}_2$  
+Let $Y$ be a random variable representing the number of elements in $R$ such that $r\leq m$. We can express $Y$ as a sum of indicator variables for each sample because we are sampling with replacement. $X_i=1$ if the $i$th selected element is less than $m$. $P(X_i=1)=\frac{(n-1)/2+1}{n}=\frac{1}{2}+\frac{1}{2n}$ because there are $n$ elements and the $(n-1)/2+1$ of them are less than the median. Thus we can easily because $Y\sim \text{binom}(n^{3/4},\frac{1}{2}+\frac{1}{2n})$ we find that $\text{Var}(Y)=n^{3/4}(1+\frac{1}{2n})(1-\frac{1}{2n})<\frac{1}{4}n^{3/4}$, and $E(Y)=\frac{1}{2}n^{3/4}+\frac{1}{2n^{1/4}}$
+Thus $P(\mathcal{E}_1)=P(Y=\Sigma_{i=1}^{n^{3/4}}X_i<\frac{1}{2}n^{3/4}-\sqrt{n})$. Because $\frac{1}{2n^{1/4}}$ is so small we say that $E(Y)\approx\frac{1}{2}n^{3/4}$. Thus by Chebyshevs we see that $P(Y<\frac{1}{2}n^{3/4}-\sqrt{n})\leq P(|Y_1-E[Y]|>\sqrt{n})\leq \frac{\text{Var}(Y)}{n}<\frac{\frac{1}{4}n^{3/4}}{n}=\frac{1}{4n^{1/4}}$  
+Finding $\mathcal{E}_3$
+At least one of the two sub-events occur if $|C|>4n^{3/4}$ 
+$\mathcal{E_{3,1}}:$ $2n^{3/4}$ elements are greater than $m$
+$\mathcal{E_{3,2}}:$ $2n^{3/4}$ elements are less than $m$
+Think about if it was evenly split both would need to happen and any shift still results in one of them still being true. We can treat these two different events using symmetry
+Assume there are at least $2n^{3/4}$ elements in $C$ greater than $m$. Thus $u$ placed in the sorted order is $\frac{1}{2}n+2n^{3/4}$ in the set $S$(we know that $m$ is at position $\frac{1}{2}n$) and we know $R$ has at least $\frac{1}{2}n^{3/4}-\sqrt{n}$ samples(because $u$ is the $\frac{1}{2}n^{3/4}+\sqrt{n}\,$th element of $R$ and there are $n^{3/4}$ elements in $R$) from the elements of $S$ greater than or equal to $\frac{1}{2}n+2n^{3/4}\,$th element. 
+
+Next we define $X$ such that $X=\Sigma^{n^{3/4}}_{i=1}X_i$ where $X_i=1$ if the $i$th sample of $R$ is greater than the $\frac{1}{2}n+2n^{3/4}\,$th largest element of $S$. We see that the $P(X_i=1)=\frac{1}{2}-2n^{-1/4}$ and there are $n^{3/4}$ elements and this is a binomial random variable thus $E[X]=\frac{1}{2}n^{3/4}-2n^{1/2}$ and $\text{Var}[X]=n^{3/4}(\frac{1}{2}-2n^{-1/4})(\frac{1}{2}+2n^{-1/4})\leq \frac{1}{4}n^{3/4}$  
+
+Note that $P(\mathcal{E_{3,1}})=P(X\geq \frac{1}{2}n^{3/4}-\sqrt{n})\leq P(X-E[X]\geq \sqrt{n})\leq\frac{Var(X)}{n}\leq\frac{\frac{1}{4}n^{3/4}}{n}=\frac{1}{4}n^{-1/4}$. By symmetry  $P(\mathcal{E_{3,2}})\leq \frac{1}{4}n^{-1/4}$. 
+Thus by union bound $P(\mathcal{E}_1 \cup \mathcal{E}_2 \cup \mathcal{E}_3)\leq \frac{1}{4}n^{-1/4}+\frac{1}{4}n^{-1/4}+\frac{1}{2}n^{-1/4}=n^{-1/4}$ 
+
+
+# Chapter 4: Chernoff Bounds
+While Markov's inequality and chebyshev inequality are nice, they decay only linearly with respect to $n$. Instead by using Chernoff Bounds we can get the probability of a rare event to decay exponentially with $n$ 
