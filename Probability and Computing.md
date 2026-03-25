@@ -112,4 +112,9 @@ Thus using the Chernoff bound we see that $P(X\geq a)=P(e^{Xt}\geq e^{ta})\leq e
 
 Now we can show that $P(|Z_i|\leq \sqrt{4m\text{ ln }n})\leq2e^{4m\text{ ln }n/2k}\leq \frac{2}{n^2}$ and by union bound since there are $n$ columns we get the bound failing for $n$ columns to be $\frac{2}{n}$  
 
-I still don't really understand the application of this yet
+I still don't really understand the application or significance of this yet
+
+
+
+## Network Routing on a Hypercube Graph
+Network routing is where you have a set of processors(Nodes of the graph) which have data packets that they need to send to other nodes. One thing you can measure 
