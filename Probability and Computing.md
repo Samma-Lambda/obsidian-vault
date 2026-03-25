@@ -105,3 +105,11 @@ The set balancing algorithm is used whenever you wanna minimize the difference b
 Sometimes we might want to balance multiple different attributes at the same time so we encode this problem as a matrix(Additionally we restrict ourselves to a matrix with entries from the set $\{0,1\}$). So for our problem we have a $n\times m$ matrix $A$ with entries $\{0,1\}$ and we trying to find a $n$ dimensional vector $b$ with entries $\{-1,1\}$ that minimizes $||Ab||_{\infty}=\text{max}_{i=1,...,n}|c_i|$.
 We will show that the by selecting a random vector $b$ with uniform entries $P(||Ab||_{\infty}\geq \sqrt{4m\,\text{ln}\,n})\leq \frac{2}{n}$ 
 We show this by considering the $i$th row $a_i=a_{i,1}+a_{i,2}+...+a_{i,n}$. Let $k$ be the number of $1$'s in the row. If $k\leq \sqrt{4m\,\text{ln}\,n}$, then clearly $|a_i\cdot b|=|c_i|\leq \sqrt{4m\,\text{ln}\,n}$ because $b$ only has entries that are $1$ and $-1$. 
+If $k\geq \sqrt{4m\text{ ln }n}$ then we know that $Z_i=\Sigma_{j=1}^m a_{i,j}b_i$ is a random variable that is the sum of $k$ independent random variables with the values $1,-1$ we can use the Chernoff bound defined below. 
+
+Let $X=\Sigma_{i=1}^n X_i$ where $P(X_i=-1)=P(X_i=1)=\frac{1}{2}$. Thus the moment generating function of $X_i$ is $\frac{1}{2}e^t+\frac{1}{2}e^{-t}$. If we do the Taylor expansion of $e^t$ we see that $e^t=1+t+\frac{t^2}{2!}+...+\frac{t^i}{i!}$ and if we do the taylor expansion of $e^{-t}=1-t+\frac{t^2}{2!}+...+(-1)^i\frac{t^i}{i!}$. Thus $\frac{1}{2}e^{-t}+\frac{1}{2}e^{t}=\Sigma \frac{t^{2i}}{(2i)!}\leq \Sigma \frac{(t^2/2)^i}{i!}=e^{t^2/2}$ 
+Thus using the Chernoff bound we see that $P(X\geq a)=P(e^{Xt}\geq e^{ta})\leq e^{t^2n/2}-ta$ setting $t=a/n$ we get $P(X\geq a)\leq e^{-a^2/2n}$  and by symmetry $P(X\leq a)\leq e^{-a^2/2n}$ which by union bound means $P(|X|\geq a)\leq 2e^{-a^2/2n}$ 
+
+Now we can show that $P(|Z_i|\leq \sqrt{4m\text{ ln }n})\leq2e^{4m\text{ ln }n/2k}\leq \frac{2}{n^2}$ and by union bound since there are $n$ columns we get the bound failing for $n$ columns to be $\frac{2}{n}$  
+
+I still don't really understand the application of this yet
