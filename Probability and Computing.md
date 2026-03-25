@@ -32,6 +32,7 @@ We can compute $ABr$ as $A(Br)$ with a time complexity of $\Theta(n^2)$.
 Let $D=AB-C$ and assume that $D\neq 0$ thus there exists at least one element in $D$ that is non-zero, arbitrarily named $d_{11}$.
 We we create a uniformly random vector $r$(filled with ones and zeros) if $Dr\neq 0$ then we return false, if $Dr=0$ then we know that $\Sigma_{j=1}^n d_{1j}r_j=0$ which can be rewritten into $r_1 = -\frac{\Sigma_{j=2}^{n}d_{1j}r_j}{d_{11}}$ the left side either takes a value $0$ or $1$ and the $r_1$ has a 50% chance of taking on that value.
 Thus our algorithm where we plug in $k$ vectors has a time complexity of $\Theta (kn^2)$ and a probability of failure of $(\frac{1}{2})^k$ 
+In line with what we have previously done for any finite field $F$ the given $n$ samples the probability of failure is $(\frac{1}{|F|})^n$. This even holds for continuous matrices which then its often still better to use bit vectors because then the math is super quick
 
 
 ## Min-Cut Algorithm
@@ -98,4 +99,9 @@ Thus by union bound $P(\mathcal{E}_1 \cup \mathcal{E}_2 \cup \mathcal{E}_3)\leq 
 
 
 # Chapter 4: Chernoff Bounds
-While Markov's inequality and chebyshev inequality are nice, they decay only linearly with respect to $n$. Instead by using Chernoff Bounds we can get the probability of a rare event to decay exponentially with $n$ 
+While Markov's inequality and Chebyshev inequality are nice, they decay only linearly with respect to $n$. Instead by using Chernoff Bounds we can get the probability of a rare event to decay exponentially with $n$. Because I have explained Chernoff bounds in my notes I will not explain them here 
+## Set Balancing Algorithm
+The set balancing algorithm is used whenever you wanna minimize the difference between two allocations of elements in sets. For example given a set of weights you might want to try and create an even split of the weights among two cars. 
+Sometimes we might want to balance multiple different attributes at the same time so we encode this problem as a matrix(Additionally we restrict ourselves to a matrix with entries from the set $\{0,1\}$). So for our problem we have a $n\times m$ matrix $A$ with entries $\{0,1\}$ and we trying to find a $n$ dimensional vector $b$ with entries $\{-1,1\}$ that minimizes $||Ab||_{\infty}=\text{max}_{i=1,...,n}|c_i|$.
+We will show that the by selecting a random vector $b$ with uniform entries $P(||Ab||_{\infty}\geq \sqrt{4m\,\text{ln}\,n})\leq \frac{2}{n}$ 
+We show this by considering the $i$th row $a_i=a_{i,1}+a_{i,2}+...+a_{i,n}$. Let $k$ be the number of $1$'s in the row. If $k\leq \sqrt{4m\,\text{ln}\,n}$, then clearly $|a_i\cdot b|=|c_i|\leq \sqrt{4m\,\text{ln}\,n}$ because $b$ only has entries that are $1$ and $-1$. 

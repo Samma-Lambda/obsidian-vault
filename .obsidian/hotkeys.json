@@ -2,7 +2,7 @@
   "editor:toggle-inline-math": [
     {
       "modifiers": [
-        "Mod",
+        "Alt",
         "Shift"
       ],
       "key": "E"
