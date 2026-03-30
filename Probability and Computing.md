@@ -117,4 +117,29 @@ I still don't really understand the application or significance of this yet
 
 
 ## Network Routing on a Hypercube Graph
-Network routing is where you have a set of processors(Nodes of the graph) which have data packets that they need to send to other nodes. One thing you can measure 
+Network routing is where you have a set of processors(Nodes of the graph) which have data packets that they need to send to other nodes. These nodes are connected to each other using directed edges. Each edge can only pass one data packet through it at a given moment(and each packet can only pass through a single edge per time step), and each node has a stack(it can send a packet out each edge at a given step). 
+
+One thing you can measure is for a given routing permutation(a situation where every node sends and receives a single packet) how quickly you can generate a route, and how efficient the generated route is. Routing permutations can nicely be represented by scrambling the string "123...n".
+
+One of the specific graphs that we are going to analyze is a hypercube. A $N$-degree hypercube has $2^{N}$ nodes. Each node is numbered $1,...2^N$ and two nodes are considered connected if their binary representation differs by a single bit IE $4$ and $5$ are connected in a hypercube graph because $100$ and $101$ differ by a single bit. Because each node can differ by a single bit and there are $n$ ways that a bit string of length $n$ can differ,  each node has $n$ edges or $2n$ edges if it is a directed graph. Finally the furthest that two nodes can be from each other is $n$ edges apart(every single bit is different)
+
+Because of the nature of our hypercube graph, we can send a packet between two nodes using bit-fixing routing. An example would be sending $000$ to $111$ would follow the following route. $000\rightarrow 100\rightarrow 110 \rightarrow 111$ 
+
+Our actual algorithm works in two phases, phase $1$ where all the packets are routed to a random node, and then phase $2$ where all those packets are finally routed to their destination. We are going to show that the algorithm has a time complexity of $O(n)$, meaning that it takes a linear number of time steps to get every packet to its correct location(the computation time of this algorithm is relatively easy to prove and has time complexity $\Omega(n)$)
+
+In order to analyze phase $1$ we need to calculate the greatest time until some packet $M$ reaches its destination. We denote the random variable that represents the time it takes for a given packet $M$ completes phase $1$ as $T_1(M)$. Note that packet $M$ is either moving through edges or waiting until the edge it needs to use is free. If the path for the packet $M$ is $P=(e_1,e_2,...,e_m)$ and the amount of packets that pass though $e_1$ is denoted as $X_1(e_1)$ then we have the upper bound $T_1(M)\leq \Sigma_{x=1}^m X_1(e_i)$(because worst case the packet has to wait for every single other packet going through every edge on its path)
+
+The probability that phase $1$ takes longer than $T$ is the probability that there exists some path $P$ such that $T_1(P)\geq T$. It is incredibly difficult to make assertions about $\Sigma^{m}_{x=1}X_1(e_i)$ because they are not independent. But instead we can make assertions about the number of packets that exist on the nodes that $P$ will utilize that have a possibility of routing through the edges $P$ uses. 
+
+These packets are known as active packets. To specify a packet is active on path $P$ if it reaches node $v_{i-1}$ and $v_{i}$ differ by a single a single bit, which has not been fixed by the bit fixing routing algorithm yet. 
+If we consider a node $v_{i-1}=(b_1,b_2,...,b_{j-1},a_j,a_{j+1},...,a_n)$ and node $v_i=(b_1,b_2,...,b_{j-1},b_j,a_{j+1},...,a_n)$ that differ by the $j\,$th bit 
+then only packets originating from $(*,*,...,*,a_j,a_{j+1},...,a_n)$ will get routed to node $v_{i-1}$(This is because if one of the later bits differs, that bit won't change until after the $j$ so it won't route through that). In the same way packets that are being sent have to have an address of $(b_1,b_2,...,b_{j-1},*,...,*)$(because otherwise it will adjust itself to not end up mapping to the node $v_{i-1}$). 
+Thus because of the restriction of where they originate there are $2^{j-1}$ possible active packets, and because of the restriction of where they are being sent each one has a $\frac{1}{2^{(j-1)}}$ chance of actually being an active packet. Thus the expected number of packets along a given route is $m$ which is less than $n$.
+
+Then we can use a chernoff bound and found earlier in the text to prove that $P(H\geq 6n \geq 6E[H])\leq 2^{-6n}$ 
+
+Now we want to show $P(T_1(P)\geq 30n)\leq P(H\geq 6n)+P(T_1(P)\geq 30n|H< 6n)$. This is using the upper bound of $P(A)\leq P(B)+P(A|\bar{B})$ which is derived from dropping terms from $P(A|B)P(B)+P(A|\bar{B})P(\bar{B})$ 
+
+We have nicely proved previously that $P(H\geq 6)\leq 2^{-6n}$ and so now we need to find $P(T_1(P)\geq 30n|H< 6n)$ which we actually find to be $P(T_1(P)\geq 30n|H< 6n)\leq 2^{3n-1}$ for some reason I don't understand right now.
+
+It is important to note that if a packet leaves the path it can't ever get back on again because it differs by at least a single bit until the end and nothing will change that. Additionally note that the probability of an active packet saying on the path when it transitions to the next node $\frac{1}{2}$ because the bits have to differ. 
