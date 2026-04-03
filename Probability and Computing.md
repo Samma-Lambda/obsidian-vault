@@ -212,3 +212,8 @@ Bucket sort is a sorting algorithm with expected time complexity of $\Omega(n)$.
 In the first phase we place the elements into $n$ buckets, we place the each element into the $j$th  
 
 I am pretty sure that you can get this to work with any distribution by using the universality of the uniform. Thus allowing you to use this algorithm within linear time with any known distribution. Possibly you could just use quantiles. 
+
+
+
+
+TEST TEST TEST TEST TEST
