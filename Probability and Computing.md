@@ -117,7 +117,7 @@ I still don't really understand the application or significance of this yet
 
 
 ## Network Routing on a Hypercube Graph
-Network routing is where you have a set of processors(Nodes of the graph) which have data packets that they need to send to other nodes. These nodes are connected to each other using directed edges. Each edge can only pass one data packet through it at a given moment(and each packet can only pass through a single edge per time step), and each node has a stack(it can send a packet out each edge at a given step). 
+Network routing is where you have a set of processors(Nodes of the graph) which have data packets that they need to send to other nodes. These nodes are connected to each other using directed edges. Each edge can only pass one data packet through it at a given moment(and each packet can only pass through a single edge per time step), and each edge has a stack(it can store packets in a queue but only send one packet). 
 
 One thing you can measure is for a given routing permutation(a situation where every node sends and receives a single packet) how quickly you can generate a route, and how efficient the generated route is. Routing permutations can nicely be represented by scrambling the string "123...n".
 
@@ -125,21 +125,90 @@ One of the specific graphs that we are going to analyze is a hypercube. A $N$-de
 
 Because of the nature of our hypercube graph, we can send a packet between two nodes using bit-fixing routing. An example would be sending $000$ to $111$ would follow the following route. $000\rightarrow 100\rightarrow 110 \rightarrow 111$ 
 
-Our actual algorithm works in two phases, phase $1$ where all the packets are routed to a random node, and then phase $2$ where all those packets are finally routed to their destination. We are going to show that the algorithm has a time complexity of $O(n)$, meaning that it takes a linear number of time steps to get every packet to its correct location(the computation time of this algorithm is relatively easy to prove and has time complexity $\Omega(n)$)
+Our actual algorithm works in two phases, phase $1$ where all the packets are routed to a random node, and then phase $2$ where all those packets are finally routed to their destination. We are going to show that the algorithm is $O(\text{Log}\,N)$  with probability $1-O(N^{-1})$. Alternatively since the number of nodes is $2^{N}$ the number of time steps scales linearly with the number of nodes in the network(but you can't pick a specific number of nodes to add because you are restricted to a hyper-cube). Due to the simplicity of the bit-fixing routing, its easy to show that the computation of the route also scales linearly with the number of nodes in the graph. 
 
-In order to analyze phase $1$ we need to calculate the greatest time until some packet $M$ reaches its destination. We denote the random variable that represents the time it takes for a given packet $M$ completes phase $1$ as $T_1(M)$. Note that packet $M$ is either moving through edges or waiting until the edge it needs to use is free. If the path for the packet $M$ is $P=(e_1,e_2,...,e_m)$ and the amount of packets that pass though $e_1$ is denoted as $X_1(e_1)$ then we have the upper bound $T_1(M)\leq \Sigma_{x=1}^m X_1(e_i)$(because worst case the packet has to wait for every single other packet going through every edge on its path)
+In order to analyze phase $1$ we need to calculate the greatest time until some packet $M$ reaches its destination. We denote the random variable that represents the time it takes for a given packet $M$ completes phase $1$ as $T_1(M)$. Note that packet $M$ is either moving through edges or waiting until the edge it needs to use is free. If the path for the packet $M$ is $P=(e_1,e_2,...,e_m)$ and the amount of packets that pass though $e_1$ is denoted as $X_1(e_1)$ then we have the upper bound $T_1(M)\leq \Sigma_{x=1}^m X_1(e_i)$(because worst case the packet has to wait for every single other packet going through every edge on its path). 
 
-The probability that phase $1$ takes longer than $T$ is the probability that there exists some path $P$ such that $T_1(P)\geq T$. It is incredibly difficult to make assertions about $\Sigma^{m}_{x=1}X_1(e_i)$ because they are not independent. But instead we can make assertions about the number of packets that exist on the nodes that $P$ will utilize that have a possibility of routing through the edges $P$ uses. 
+The probability that phase $1$ takes longer than $T$ is the probability that there exists some path $P=\Sigma_{x=1}^m X_1(e_i)$ such that $T_1(P)\geq T$. It is incredibly difficult to make assertions about $\Sigma^{m}_{x=1}X_1(e_i)$ because they are not independent. But instead we can make assertions about the number of packets that exist on the nodes that $P$ will utilize that have a possibility of routing through the edges $P$ uses. 
 
-These packets are known as active packets. To specify a packet is active on path $P$ if it reaches node $v_{i-1}$ and $v_{i}$ differ by a single a single bit, which has not been fixed by the bit fixing routing algorithm yet. 
+These packets are known as active packets. To specify a packet is active on path $P$ if it reaches node $v_{i-1}$  and $v_{i}$ differ by a single a single bit, which has not been fixed by the bit fixing routing algorithm yet. $v_{i-1}$ and $v_i$ are on path $P$
+
 If we consider a node $v_{i-1}=(b_1,b_2,...,b_{j-1},a_j,a_{j+1},...,a_n)$ and node $v_i=(b_1,b_2,...,b_{j-1},b_j,a_{j+1},...,a_n)$ that differ by the $j\,$th bit 
 then only packets originating from $(*,*,...,*,a_j,a_{j+1},...,a_n)$ will get routed to node $v_{i-1}$(This is because if one of the later bits differs, that bit won't change until after the $j$ so it won't route through that). In the same way packets that are being sent have to have an address of $(b_1,b_2,...,b_{j-1},*,...,*)$(because otherwise it will adjust itself to not end up mapping to the node $v_{i-1}$). 
-Thus because of the restriction of where they originate there are $2^{j-1}$ possible active packets, and because of the restriction of where they are being sent each one has a $\frac{1}{2^{(j-1)}}$ chance of actually being an active packet. Thus the expected number of packets along a given route is $m$ which is less than $n$.
+Thus because of the restriction of where they originate there are $2^{j-1}$ possible active packets, and because of the restriction of where they are being sent each one has a $\frac{1}{2^{(j-1)}}$ chance of actually being an active packet. Thus the expected number of packets along a given route is $m$ which is less than $n$. We denote the number of active packets on a path using the random variable $H$
 
 Then we can use a chernoff bound and found earlier in the text to prove that $P(H\geq 6n \geq 6E[H])\leq 2^{-6n}$ 
 
-Now we want to show $P(T_1(P)\geq 30n)\leq P(H\geq 6n)+P(T_1(P)\geq 30n|H< 6n)$. This is using the upper bound of $P(A)\leq P(B)+P(A|\bar{B})$ which is derived from dropping terms from $P(A|B)P(B)+P(A|\bar{B})P(\bar{B})$ 
+Now we want to show $P(T_1(P)\geq 30n)\leq P(H\geq 6n)+P(T_1(P)\geq 30n|H< 6n)$. This inequality is from $P(A)\leq P(B)+P(A|\bar{B})$ which is derived from dropping terms from $P(A|B)P(B)+P(A|\bar{B})P(\bar{B})$. We want to do this because we want to show that $P(T_1(P)\geq 30n)$ is less than $2^{-3n}$ because then we can use the union bound of the $2^{2n}$ possible paths 
 
-We have nicely proved previously that $P(H\geq 6)\leq 2^{-6n}$ and so now we need to find $P(T_1(P)\geq 30n|H< 6n)$ which we actually find to be $P(T_1(P)\geq 30n|H< 6n)\leq 2^{3n-1}$ for some reason I don't understand right now.
+Since we proved that $P(H\geq 6)\leq 2^{-6n}$ we just need to show that $P(T_1(P)\geq 30n|H< 6n)\leq 2^{-3n-1}$ because then our union bound works  
 
-It is important to note that if a packet leaves the path it can't ever get back on again because it differs by at least a single bit until the end and nothing will change that. Additionally note that the probability of an active packet saying on the path when it transitions to the next node $\frac{1}{2}$ because the bits have to differ. 
+It is important to note that if a packet leaves the path it can't ever get back on again because it differs by at least a single bit until the end and nothing will change that. Additionally note that the probability of an active packet saying on the path when it transitions to the next node $\frac{1}{2}$ because the bits have to differ. The chance of $6n$ active packets transitioning more then $30n$ times is less than the probability given $36n$ coins getting less than $6n$. This makes sense if you think of each packet having a chance of transitioning as a coin flip, with a success being the packet leaving the path and each failure representing traversing an edge. But once there are more than $6n$ success there will be no more active packets because they have all transitioned off. Thus letting $Z$ be the number of successes in $36n$ coin flips
+We see that $P(T_1(P)\geq 30n|H\leq 6n)\leq P(Z\leq 6n)\leq e^{-18(2/3)^2/2}=e^{-4n}\leq2^{-3n-1}$ 
+
+Thus $P(T_1(P)\geq 30n)\leq P(H\geq 6n)+P(T_1(P)\geq 30n|H\leq 6n)\leq 2^{-3n}$ and since there are $2^{2n}$ possible paths, by union bound $P(T\geq 30n)\leq 2^{-n}$ or because $\text{log}_2\,n=N$ it has $O(N^{-1})$ 
+
+The second phase is just running the first phase in reverse, since we are at a random location and now going to a deterministic location. Thus the probability that no packet spends more than $30n$ time steps getting to their location has probability $1-O(N^{-1})$.
+
+Thus our algorithm takes less than $60n$ steps with probability $1-O(N^{-1})$. Note since there is $2nN$ directed edges in the graph and we are routing $N$ packets at most at any given moment only $\frac{1}{2}n$ edges are being used
+
+## Network Routing on a Butterfly Graph
+Choosing to ignore for now 
+
+
+# Chapter 5: Balls, Bins, Random Graphs, Poisson Approximation
+## Approximating the birthday paradox
+The birthday paradox is not actually a paradox. It is the problem where you have $n$ elements and $m$ categories. The elements are uniformly distributed across all the categories. We are concerned about the probability that two elements share a category. To calculate this we can more easily calculate the probability that no two elements share a category which is the following number
+$$
+\Pi_{j=1}^{m}(1-\frac{j}{n})
+$$
+Since the taylor approximation of $e^x=1-x$ we can approximate $1-\frac{j}{n}$ as $e^{\frac{j}{n}}$ so we can approximate this as 
+$$
+\Pi_{j=1}^{m}e^\frac{j}{n}
+$$
+which is way way faster to calculate. 
+We can get a upper bound on the probability of a collision by considering the event $E_i$ where the $i\text{th}$ person not matching any of the previous people. Thus
+$$
+P(E_1,E_2,...,E_k)\leq\Sigma_{i=1}^{k}P(E_i)\leq \Sigma_{i=1}^{k}\frac{i-1}{n}=\frac{k(k-1)}{2n}
+$$
+This is true using a union bound, assumption that no prior people matched, then an application of gauss's sum. From this we can see that if there is less than $\sqrt{n}$ people that then there is at least a $\frac{1}{2}$ probability that all birthdays are distinct. 
+If we assume the that the first $\sqrt{n}$ people have distinct birthdays then the probability the next $\sqrt{n}$ people are distinct is 
+$$
+(1-\frac{1}{\sqrt{n}})^{\sqrt{n}}\leq\frac{1}{e}
+$$
+Thus the probability of $2\sqrt{n}$ people all having distinct birthdays is at most $\frac{1}{e}$  
+
+## Bound on Balls and Bins  
+Often algorithms want to understand based off uniformly distributed items, what is the the behavior once they are placed in bins. This can be used in load balancing for distributed computing, memory allocation and resource management. In this problem we prove that if we throw $n$ balls into $n$ bins, the chance of any bin having more than $3\ln(n)/\ln(\ln(n))$ is less than $\frac{1}{n}$
+
+We can easily see that the probability of a specific bin having $j$ balls when there are $m$ balls and $n$ bins is at most 
+$$
+\binom{n}{j}(\frac{1}{n})^j
+$$
+This is calculated using a union bound and counting the number of ways there can be $j$ balls from $n$ balls. We see that the following inequality is true because $\frac{n!}{(n-j)!n^j}\leq 1$
+$$
+\binom{n}{j}(\frac{1}{n})^j=\frac{n!}{j!(n-j)!\,n^j}=\frac{1}{j!}\frac{n!}{(n-j)!n^j}\leq \frac{1}{j!}
+$$
+Further we see since $\frac{k^k}{k!}\leq\Sigma_{i=0}^k\frac{k^i}{i!}=e^{k}$(The inequality is true because $\frac{k^k}{k!}$ is an element of the sum, the equality is true because its the taylor expansion of $e^k$). We can rearrange this to get $\frac{1}{k!}\leq(\frac{e}{k})^k$. Thus we get the statement
+$$
+\binom{n}{j}(\frac{1}{n})^j\leq \frac{1}{j!} \leq (\frac{e}{k})^k
+$$
+Using this upper bound and a union bound on the $n$ boxes, for $j\geq 3\ln(n)/\ln(\ln(n))$ that the probability any bin has at least $j$ balls is less than $\frac{1}{n}$ 
+$$
+n(\frac{e}{j})^{j}\leq (\frac{e\ln(\ln(n))}{3\ln(n)})^{3\ln(n)/\ln(\ln(n))}
+$$
+Above is true because $j$ is at least $3\ln(n)/\ln(\ln(n))$ by definition we then remove $\frac{e}{3}$ which creates another bound because it is greater than one giving us 
+$$
+(\frac{e\ln(\ln(n))}{3\ln(n)})^{3\ln(n)/\ln(\ln(n))}\leq\frac{\ln(\ln(n))}{\ln(n)})^{3\ln(n)/\ln(\ln(n))}
+$$
+which then we rewrite by doing $e^{\ln()}$ which gives us 
+$$
+e^{-2\ln(n)+3(\ln(n))(\ln(\ln(\ln(n))))/\ln(\ln(n))}
+$$
+Which is less than $\frac{1}{n}$ so we have proven what is desired
+
+## Bucket Sort
+Bucket sort is a sorting algorithm with expected time complexity of $\Omega(n)$. It works under the assumption that we have $n=2^m$ elements uniformly distributed on the interval $[0,2^k)$ where $m\leq k$.
+In the first phase we place the elements into $n$ buckets, we place the each element into the $j$th  
+
+I am pretty sure that you can get this to work with any distribution by using the universality of the uniform. Thus allowing you to use this algorithm within linear time with any known distribution. Possibly you could just use quantiles. 
