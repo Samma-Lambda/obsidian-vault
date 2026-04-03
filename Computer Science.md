@@ -27,4 +27,4 @@ The study of what computers can and can't do
 [[Theory of Computation]]
 
 
-[[Github Flow]]
+[[Bash Scripting, Terminal, and Github]]
