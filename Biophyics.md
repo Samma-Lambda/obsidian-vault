@@ -34,3 +34,6 @@ $P(\text{Myosin 1 unbind plus bind}<t)$ is the CDF of the convolution
 
 
 Myosin 1 unbinds for the first time at time $x$ and then rebinds fro the first time at time $y$ 
+
+
+SHOWS pull on startup
