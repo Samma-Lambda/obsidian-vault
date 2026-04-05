@@ -9,6 +9,7 @@ Parameters to find:
 Assumptions 
 - That $L_1 \propto \alpha_1$   
 - All myosin are the same
+- $\lambda_1 = $
 
 
 The myosin transitions from bound to unbound with time $T_1 \sim \text{Hyperexpo}(\lambda_1,\lambda_2)$ and transitions from unbound to bound $T_2 \sim \text{Hyperexpo}(\lambda_3,\lambda_4)$. 
@@ -17,24 +18,15 @@ When all myosin are in the unbound state the actin diffuses.
 
 
 
-## Modeling a filament diffusing assuming all Myosin start bound 
-In the case of two myosin:
-THIS IS CURRENTLY NOT CORRECT BECAUSE IT DOES NOT ACCOUNT FOR UNBINDING 
-$P(\text{Diffusion in time}[t_1,t_2])=$$P(\text{Myosin 1 unbinds for the first 1st before }t_2 \text{ and does not rebind until after }t_2\text{ and Myosin 2 unbinds for the 1st time at in }[t_1,t_2])$$+$$P(\text{Myosin 1 unbinds for the 2nd time before }t_2 \text{ and does not rebind until after }t_2\text{ and Myosin 2 unbinds for the 1st time at in }[t_1,t_2])$$+$
-$...$
-$+$$P(\text{Myosin 1 unbinds for the nth time before }t_2 \text{ and does not rebind until after }t_2\text{ and Myosin 2 unbinds for the 1st time at in }[t_1,t_2])$$+$$P(\text{Myosin 1 unbinds for the first 1st before }t_2 \text{ and does not rebind until after }t_2\text{ and Myosin 2 unbinds for the 2nd time at in }[t_1,t_2])$$...$
-$+$$P(\text{Myosin 1 unbinds for the nth  before }t_2 \text{ and does not rebind until after }t_2\text{ and Myosin 2 unbinds for the 2nd time at in }[t_1,t_2])$$+$
-$...$
-$+$$P(\text{Myosin 1 unbinds for the nth 1st before }t_2 \text{ and does not rebind until after }t_2\text{ and Myosin 2 unbinds for the nth time at in }[t_1,t_2])$
-$P(\text{Myosin 1 is bound at time } t)=P(\text{Myosin 1 stays bound until }t)+P(\text{Myosin 1 unbind plus bind}<t \text{ stays bound until t})$ 
-$P(\text{Myosin 1 stays bound until }t)$ is $1-\text{CDF of bound to unbound}$ 
-$P(\text{Myosin 1 unbind plus bind}<t)$ is the CDF of the convolution 
+## Modeling a filament diffusing assuming all Myosin start bound
 
+Continous time markov chain for a single myosin
+$$
+\begin{bmatrix}  
+\lambda_1 & \lambda_1 & 0 & 0\\  
+0 & \lambda_2 & \lambda_2 & 0\\
+0 & 0 & \lambda_3 & \lambda_3 \\
+\lambda_4 & 0 & 0 & \lambda_4
+\end{bmatrix}
+$$
 
-
-
-Myosin 1 unbinds for the first time at time $x$ and then rebinds fro the first time at time $y$ 
-
-
-SHOWS pull on startup 12343231232
-aaaa
