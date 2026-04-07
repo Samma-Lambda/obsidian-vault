@@ -209,11 +209,23 @@ Which is less than $\frac{1}{n}$ so we have proven what is desired
 
 ## Bucket Sort
 Bucket sort is a sorting algorithm with expected time complexity of $\Omega(n)$. It works under the assumption that we have $n=2^m$ elements uniformly distributed on the interval $[0,2^k)$ where $m\leq k$.
-In the first phase we place the elements into $n$ buckets, we place the each element into the $j$th  
+In the first phase we place the elements into $n$ buckets, we place the each element into the $j$th bin if its first binary digits match with if the first $m$ digits in the binary representation. 
+IE if $n=2^{10}$ bucket $3$ contains all of the elements with the starting bits $0000000011$. This means that if a element is in a bucket greater than another elements bucket, then it is greater than it. We can place the elements into the correct buckets with linear time. 
 
-I am pretty sure that you can get this to work with any distribution by using the universality of the uniform. Thus allowing you to use this algorithm within linear time with any known distribution. Possibly you could just use quantiles. 
+Note that since that since the elements are uniformly distributed, the distribution of the number of elements in a single bucket is $\text{bin}(n,\frac{1}{n})$. We then sort the elements within each bucket with some sorting algorithm(with time complexity less than $n^2$). The expected time of sorting all of these algorithms is $E[\Sigma_{i=1}^{n} c X_i^2]=cE[\Sigma_{i=1}^{n} X_i^2]=cE[\Sigma_{i=1}^{n} X_1^2]=cnE[ X_1^2]$. We can actually calculate $E[ X_1^2]=\frac{n(n-1)}{n^2}+1=2-\frac{1}{n}\leq 2$.  Thus the expected time complexity of this algorithm scales linearly. 
 
+I am pretty sure that you can get this to work with any distribution by using the universality of the uniform. 
 
+## Poisson Approximation 
+Because of the difficulty with calculating the values for binomials variables with large number of trial. IE if $X\sim\text{Bin}(4000,p)$ and we want to calculate $P(X=1256)=\binom{4000}{1256}(1-p)^{2744}p^{1256}$ which can be incredibly computationally intensive. But you might notice that for large $n$ and small $p$ that the distribution of $X$ is roughly the poisson random variable.
+To formalize this if we throw $m$ balls into $n$ bins, and denote the number of balls in the $n$th bin as $X_i^{m}$. Additionally let $Y_i^{m}$ be poisson random variables with $\mu = \frac{m}{n}$. 
 
+First we show that $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k \sim (X_1^{m},...,X_n^{m})$
+We can show that $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k$ has the same distribution as $(X_1^{m},...,X_n^{m})$
+Here is the proof
+$P((X_1^{(k)},...,X_n^{(k)})=k_1,k_2,...,k_n)$ where $\Sigma_{i=1}^{k}X_i=k$ equals $\frac{k!}{(k_1!)(k_2!)...(k_n!)}n^k$   just by counting. 
+Now we want to find the probability that $P\left((Y_1^{k},...,Y_n^{k})=(k_1,...,k_n)| \Sigma_{i=1}^{k}Y_i=k\right)$ which we can write as $\frac{P((Y_1^{m}=k_1)\cap (Y_2^{m}=k_2)\cap ...\cap (Y_n^{m}=k_n))}{P(\Sigma_{i=1}^{k}Y_i=k)}$ which because the $Y_i$'s are independent(in this case not in generate) and because the sum of poisson random variables is a poison random variable we can rewrite the previous statement as $\frac{\Pi e^{-m/n}(m/n)^k_i/k_i}{e^{-m}m^k/k!}$ which by properties of exponents simplifies to $\frac{k!}{(k_1!)(k_2!)...(k_n!)}n^k$
 
-TEST TEST TEST TEST TEST
+Then using that we are able to prove that $E[f(X^{m}_1,...,X^{m}_1)]\leq e\sqrt{m}E[f(Y^{m}_1,...,Y^{m}_n)]$. This initially seemed useless but actually provides a massive amount of utility when you consider indicator functions. If you have a function when that returns one when $X_1^{m}=a$ and returns zero otherwise, we have $[f(X^{m}_1,...,X^{m}_1)]=P(X_1^{m}=a)$. We can do this for all events, thus if we prove this we prove that the poisson version of the event times $e\sqrt{m}$ is the upper bound on the probability of it in the binomial case
+
+ By the LOTE $E[f(Y^{m}_1,...,Y^{m}_n)]=\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)$ which we can drop all the other terms in that sum and get $\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)\leq E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]P(\Sigma_{i=1}^{k}Y_i=m)$ Which we know from proving $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k \sim (X_1^{m},...,X_n^{m})$ that $E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]=E[f(X^{m}_1,...,X^{m}_1)]$. 
