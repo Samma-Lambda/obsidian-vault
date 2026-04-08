@@ -229,3 +229,9 @@ Now we want to find the probability that $P\left((Y_1^{k},...,Y_n^{k})=(k_1,...,
 Then using that we are able to prove that $E[f(X^{m}_1,...,X^{m}_1)]\leq e\sqrt{m}E[f(Y^{m}_1,...,Y^{m}_n)]$. This initially seemed useless but actually provides a massive amount of utility when you consider indicator functions. If you have a function when that returns one when $X_1^{m}=a$ and returns zero otherwise, we have $[f(X^{m}_1,...,X^{m}_1)]=P(X_1^{m}=a)$. We can do this for all events, thus if we prove this we prove that the poisson version of the event times $e\sqrt{m}$ is the upper bound on the probability of it in the binomial case
 
  By the LOTE $E[f(Y^{m}_1,...,Y^{m}_n)]=\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)$ which we can drop all the other terms in that sum and get $\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)\leq E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]P(\Sigma_{i=1}^{k}Y_i=m)$ Which we know from proving $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k \sim (X_1^{m},...,X_n^{m})$ that $E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]=E[f(X^{m}_1,...,X^{m}_1)]$. 
+ 
+ So now we have $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)]P(\Sigma_{i=1}^{k}Y_i=m)$ 
+
+
+# Important Properties 
+- $1-x\approx e^{-x}$: We derive this from the Taylor expansion of $e^x$ which is $1+x+\frac{x^2}{2!}+\frac{x^2}{3!}+...+\frac{x^n}{n!}$ so if $x$ is small this works because we are dropping a lot of smaller terms
