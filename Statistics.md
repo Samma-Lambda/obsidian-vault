@@ -2,7 +2,7 @@
 tags:
   - Applied
 ---
-# Types of Convergence 
+# Types of Convergence in Statistics
 There are a few different types of convergence in probability and statistics. IT IS VERY IMPORTANT TO DISTINGUISH BETWEEN THEM
 ## Converges in Probability
 A sequence $X_n$ converges in probability to a value $x$ if $P(|X_n-x|)<\epsilon$  $\forall \epsilon >0$ as $n\rightarrow \infty$. An example of this would be 
@@ -11,11 +11,11 @@ A sequence $X_n$ converges in probability to a value $x$ if $P(|X_n-x|)<\epsilon
 This is where $n\rightarrow \infty$ we see that $P(X_n=x)=1$. An example of this would be having a head before the $n$th flip 
 
 ## Converges in Distribution
-This is where as $n\rightarrow \infty$ a distribution converges to another distribution. An example of this would be the central limit theorem showing that a large number of i.i.d converges to the normal distribution 
+This is where as $n\rightarrow \infty$ a distribution converges to another distribution. An example of this would be the central limit theorem showing that the sum of a large number of i.i.d converges to the normal distribution. 
 
 
 # Large Sample Sizes
-A common effect within statistics is that the estimation of things because better as you get more data. For example the sample mean becomes more and more reliable as the sample size gets larger and larger, these theorems seek to make more formal statements about this effect
+A common effect within statistics is that the estimation of things because better as you get more data. For example the sample mean becomes more and more reliable as the sample size gets larger and larger(because the variance of its distribution gets smaller). 
 ## Markovs Inequality
 This inequality states that for random variables $X>0$
 $$
@@ -31,7 +31,7 @@ $$
 This is proved using a specific case of Markovs Inequality where you use the random variable  $Y=(X-E[X])^2$. This shows that $P(X-E[X]\ge t)=P(Y\ge t^2)\le \frac{E[X-E[X])]}{t^2}$. This can provide useful bounds of the probability that a random variable strays aways from the expected value.
 
 ## Chernoff Bounds
-This is another specific case of Markovs Inequality. We start with 
+This is another specific case of Markov's Inequality. We start with 
 $$P(X>a)=P(e^{tX}>e^{ta})\leq \frac{E[e^{tX}]}{e^{ta}}=\frac{M_{X}(t)}{e^{ta}}$$
 Where $M_X(t)$ is the moment generating function of $X$. This may seem arbitrary but this holds for any $t>0$ so you get to find the minimal $t$ value.  
 
@@ -41,7 +41,7 @@ This is proven using a Taylor approximation of function. For any convex function
 $$
 E[f(x)]\geq f(E[x])
 $$
-
+You can prove this using the taylor expansion, but I am not including the proof 
 
 ## Law of Large numbers
 This states that the sample mean $\bar{X}_n$ converges in probability to the true mean $\mu$. It is important to note the difference between converges in probability and converges to a constants. We can ensure that it will get closer to the mean but ad infinitum it won't equal $1$
@@ -64,8 +64,6 @@ Sometimes you want to do a prior which does not integrate to $1$ and thus is not
 The bias of an estimator is defined as $E[\hat{\theta}]-\theta$, and an unbiased estimator is defined an estimator which has no bias. A surprising amount of the time estimators are biased, take for example the M.L.E of the german tank problem the expected value of $\hat{\theta}$ is less than the actual value of $\theta$. 
 ### Consistency 
 An estimator of a parameter is considered Consistent if as $n\rightarrow \infty$ the estimator converges in probability to the true parameter $\theta$. An example of this would be the sample mean when sampling from a normal distribution with parameters $\mu,\sigma^2$. The distribution of $\bar{X}_n \sim \text{norm}(\mu,\frac{\sigma^2}{n})$ so as $n\rightarrow \infty$ $P(|\mu-\bar{X}_n|>\epsilon)=0$  
-
-
 
 
 ## Maximum Likelihood Estimation
@@ -99,10 +97,10 @@ which then you can solve for $\alpha$ and $\beta$ using the sample moments becau
 # Sampling Distribution
 This is where you take multiple observations from a distribution and pass it into a function which outputs a value. Often our function is sample mean or sample variance, but it can be more complicated functions including the max or min of a sample. 
 ## Sample Mean and Variance
-We define $\bar{X}_n=\frac{1}{n}(X_1+...+X_n)$ where all $X_i$ come from the same distribution itself is a random variable. We can easily see using the properties of expected value and variance see that $E[\bar{X}_n]=\mu$ and $\text{Var}(\bar{X}_n)=\frac{\sigma^2}{n}$. Additionally there is the strange property that the sample mean and the sample variance are independent random variables 
+We define $\bar{X}_n=\frac{1}{n}(X_1+...+X_n)$ where all $X_i$ come from the same distribution itself is a random variable. We can easily see using the properties of expected value and variance see that $E[\bar{X}_n]=\mu$ and $\text{Var}(\bar{X}_n)=\frac{\sigma^2}{n}$. Additionally there is the strange property that the sample mean and the sample variance are independent random variables. 
 
 ## Distribution of  Sample Variance and Mean for Normal distribution
-The sample mean $\frac{1}{n}\Sigma X_i$  when sampling from a normal distribution is a normal distribution which can be proved by seeing that the sum of normals is normal and that the scaled version of normal distributions is normal
+The sample mean $\frac{1}{n}\Sigma X_i$  when sampling from a normal distribution is a normal distribution which can be proved by seeing that the sum of normals is normal and that the scaled version of normal distributions is normal. 
 
 Alternatively $\frac{n\hat{\sigma^2}}{\sigma^2}$ follows the chi squared distribution with $n-1$ degrees of freedom. The chi squared distribution with $n$ degrees of freedom is equivalent to $X_1^2+...+X_n^2$ 
 

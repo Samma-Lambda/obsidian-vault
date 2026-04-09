@@ -178,8 +178,11 @@ $$
 $$
 Thus the probability of $2\sqrt{n}$ people all having distinct birthdays is at most $\frac{1}{e}$  
 
-## Bound on Balls and Bins  
-Often algorithms want to understand based off uniformly distributed items, what is the the behavior once they are placed in bins. This can be used in load balancing for distributed computing, memory allocation and resource management. In this problem we prove that if we throw $n$ balls into $n$ bins, the chance of any bin having more than $3\ln(n)/\ln(\ln(n))$ is less than $\frac{1}{n}$
+## Maximum Load on Balls and Bins  
+Often algorithms want to understand based off uniformly distributed items, what is the the behavior once they are placed in bins. This can be used in load balancing for distributed computing, memory allocation and resource management. We can currently prove that the maximum load in balls is less than $3\ln(n)/\ln(\ln(n))$ and more than $\ln(n)/\ln(\ln(n))$ with probability $1-\frac{1}{n}$
+
+### Upper bound on maximum load
+In this problem we prove that if we throw $n$ balls into $n$ bins, the chance of any bin having more than $3\ln(n)/\ln(\ln(n))$ is less than $\frac{1}{n}$
 
 We can easily see that the probability of a specific bin having $j$ balls when there are $m$ balls and $n$ bins is at most 
 $$
@@ -206,6 +209,11 @@ $$
 e^{-2\ln(n)+3(\ln(n))(\ln(\ln(\ln(n))))/\ln(\ln(n))}
 $$
 Which is less than $\frac{1}{n}$ so we have proven what is desired
+### Lower Bound on maximum load
+When we throw $n$ balls independently and uniformly at random into $n$ bins the maximum load is at least $\ln(n)/\ln\ln(n)$ with probability $1-\frac{1}{n}$
+
+We can see that the probability a specific bin has load $M=\ln n/\ln \ln n$ is at least $1/eM!$. In the Poisson case the bins are independent, so the probability that no bin has load $M$ is at most $1-(\frac{1}{eM!})^n$ which is less than $e^{-n/(eM!)}$.
+Now we need to prove that $e^{-n/(eM!)}\leq n^{-2}$ because if we prove that we can use a Poisson approximation we can multiply it by $e\sqrt{n}$ and see that $e\sqrt{n}n^{-2}$ is less than $\frac{1}{n}$. we can prove this is true, but I don't currently understand how.  
 
 ## Bucket Sort
 Bucket sort is a sorting algorithm with expected time complexity of $\Omega(n)$. It works under the assumption that we have $n=2^m$ elements uniformly distributed on the interval $[0,2^k)$ where $m\leq k$.
@@ -217,21 +225,22 @@ Note that since that since the elements are uniformly distributed, the distribut
 I am pretty sure that you can get this to work with any distribution by using the universality of the uniform. 
 
 ## Poisson Approximation 
-Because of the difficulty with calculating the values for binomials variables with large number of trial. IE if $X\sim\text{Bin}(4000,p)$ and we want to calculate $P(X=1256)=\binom{4000}{1256}(1-p)^{2744}p^{1256}$ which can be incredibly computationally intensive. But you might notice that for large $n$ and small $p$ that the distribution of $X$ is roughly the poisson random variable.
-To formalize this if we throw $m$ balls into $n$ bins, and denote the number of balls in the $n$th bin as $X_i^{m}$. Additionally let $Y_i^{m}$ be poisson random variables with $\mu = \frac{m}{n}$. 
+Because of the difficulty with calculating the values for binomials variables with large number of trial. IE if $X\sim\text{Bin}(4000,p)$ and we want to calculate $P(X=1256)=\binom{4000}{1256}(1-p)^{2744}p^{1256}$ which can be incredibly computationally intensive. But you might notice that for large $n$ and small $p$ that the distribution of $X$ is roughly the Poisson random variable.
+To formalize this if we throw $m$ balls into $n$ bins, and denote the number of balls in the $n$th bin as $X_i^{m}$. Additionally let $Y_i^{m}$ be Poisson random variables with $\mu = \frac{m}{n}$. 
 
 First we show that $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k \sim (X_1^{m},...,X_n^{m})$
 We can show that $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k$ has the same distribution as $(X_1^{m},...,X_n^{m})$
 Here is the proof
 $P((X_1^{(k)},...,X_n^{(k)})=k_1,k_2,...,k_n)$ where $\Sigma_{i=1}^{k}X_i=k$ equals $\frac{k!}{(k_1!)(k_2!)...(k_n!)}n^k$   just by counting. 
-Now we want to find the probability that $P\left((Y_1^{k},...,Y_n^{k})=(k_1,...,k_n)| \Sigma_{i=1}^{k}Y_i=k\right)$ which we can write as $\frac{P((Y_1^{m}=k_1)\cap (Y_2^{m}=k_2)\cap ...\cap (Y_n^{m}=k_n))}{P(\Sigma_{i=1}^{k}Y_i=k)}$ which because the $Y_i$'s are independent(in this case not in generate) and because the sum of poisson random variables is a poison random variable we can rewrite the previous statement as $\frac{\Pi e^{-m/n}(m/n)^k_i/k_i}{e^{-m}m^k/k!}$ which by properties of exponents simplifies to $\frac{k!}{(k_1!)(k_2!)...(k_n!)}n^k$
+Now we want to find the probability that $P\left((Y_1^{k},...,Y_n^{k})=(k_1,...,k_n)| \Sigma_{i=1}^{k}Y_i=k\right)$ which we can write as $\frac{P((Y_1^{m}=k_1)\cap (Y_2^{m}=k_2)\cap ...\cap (Y_n^{m}=k_n))}{P(\Sigma_{i=1}^{k}Y_i=k)}$ which because the $Y_i$'s are independent(in this case not in generate) and because the sum of Poisson random variables is a poison random variable we can rewrite the previous statement as $\frac{\Pi e^{-m/n}(m/n)^k_i/k_i}{e^{-m}m^k/k!}$ which by properties of exponents simplifies to $\frac{k!}{(k_1!)(k_2!)...(k_n!)}n^k$
 
-Then using that we are able to prove that $E[f(X^{m}_1,...,X^{m}_1)]\leq e\sqrt{m}E[f(Y^{m}_1,...,Y^{m}_n)]$. This initially seemed useless but actually provides a massive amount of utility when you consider indicator functions. If you have a function when that returns one when $X_1^{m}=a$ and returns zero otherwise, we have $[f(X^{m}_1,...,X^{m}_1)]=P(X_1^{m}=a)$. We can do this for all events, thus if we prove this we prove that the poisson version of the event times $e\sqrt{m}$ is the upper bound on the probability of it in the binomial case
+Then using that we are able to prove that $E[f(X^{m}_1,...,X^{m}_1)]\leq e\sqrt{m}E[f(Y^{m}_1,...,Y^{m}_n)]$. This initially seemed useless but actually provides a massive amount of utility when you consider indicator functions. If you have a function when that returns one when $X_1^{m}=a$ and returns zero otherwise, we have $[f(X^{m}_1,...,X^{m}_1)]=P(X_1^{m}=a)$. We can do this for all events, thus if we prove this we prove that the Poisson version of the event times $e\sqrt{m}$ is the upper bound on the probability of it in the binomial case
 
  By the LOTE $E[f(Y^{m}_1,...,Y^{m}_n)]=\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)$ which we can drop all the other terms in that sum and get $\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)\leq E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]P(\Sigma_{i=1}^{k}Y_i=m)$ Which we know from proving $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k \sim (X_1^{m},...,X_n^{m})$ that $E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]=E[f(X^{m}_1,...,X^{m}_1)]$. 
- 
- So now we have $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)]P(\Sigma_{i=1}^{k}Y_i=m)$ 
 
+Thus we know that $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)] P(\Sigma_{i=1}^{k}Y_i=m)$ which since the sum of Poisson random variables is a Poisson random variable we can calculate $P(\Sigma_{i=1}^{k}Y_i=m)=\frac{m^me^{-m}}{m!}$. But we can place a better bound on this using the property that $m!\leq e\sqrt{m}(\frac{n}{e})^m$ we will not prove this property. So now we have proven that $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)]\frac{1}{e\sqrt{m}}$ thus we can now do Poisson approximations!
+### Special Case of Poisson Approximation
+If you have some function $f$ that is non-negative such that $E(f((X^{m}_1,...,X^{m}_1)))$ is monotonically increasing or decreasing with respect to $m$ then we know that $E(f(X^{m}_1,...,X^{m}_1))\leq 2 E[f(Y^{m}_1,...,Y^{m}_n)]$. 
+An example of this would be the number of empty bins. As you increase the number of bins the expected number of empty bins decreases monotonically.
+Thus to calculate the probability that given $n$ bins and $m$ balls, we first change the probability of a bin being empty from being the probability $(1-\frac{1}{n})^m$ that is highly dependent on the values of the other bins to $\lambda = ne^{-m/n}$ that is independent. Then we calculate the probability of $k$ bins being empty in the Poisson case as $ne^{-m/n}$ which then we can get an upper bound in the binomial case by calculating $2ne^{-m/n}$
 
-# Important Properties 
-- $1-x\approx e^{-x}$: We derive this from the Taylor expansion of $e^x$ which is $1+x+\frac{x^2}{2!}+\frac{x^2}{3!}+...+\frac{x^n}{n!}$ so if $x$ is small this works because we are dropping a lot of smaller terms
