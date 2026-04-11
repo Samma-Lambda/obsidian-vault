@@ -5,7 +5,7 @@
 - Datafest Replacement
 ### Statistics
 - Final
-- Homeworks
+- 3 Homeworks 
 ### Probability and Computing
 - Final
 - Project presentation
@@ -18,8 +18,17 @@
 ### Theatre Work
 - Go to shifts a few more times
 - work during weekend 
+### Thesis 
+- Colloquium presentation
+### Work 
+- Do dayton work forms 
 
+### TA
+- Grade the Hashmap Assignments 
 
+### Completed Battles
+- 1 Mathematical Statistics HW 
+- Figure out travel to park city
 
 
 To-Do

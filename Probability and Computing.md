@@ -17,26 +17,26 @@ Given a function $g$ and $f$ we would say that $f$ is $o(g)$ if there exists som
 
 
 ## Polynomial Equality Verification
-Given two polynomials one factored(in the form of $g(x)=(x-a_1)(x-a_2)...(x-a_n)$) and one in canonical form($f(x)=b_1x^d+b_2x^{d-1}+...+b_n$). To deterministically solve this we would have to factor out the factored form which would take $\Theta(d^2)$ multiplication operations.
+Given two polynomials one factored(in the form of $g(x)=(x-a_1)(x-a_2)...(x-a_n)$) and one in canonical form($f(x)=b_1x^d+b_2x^{d-1}+...+b_n$). To deterministically solve this we would have to factor out the factored form which would take $\Theta(d^2)$ multiplication operations where $d$ is the degree.
 But we can actually solve this non-deterministically, using the fact that if $f(x)=g(x)$ then $f(x)-g(x)=0$. Thus if we plug in some value $\alpha$ and we get $f(\alpha )\neq g(\alpha)$ then we know the polynomials are not equal.
 Additionally since polynomials are closed under addition, we know that $f(x)-g(x)$ is a polynomial with degree at most $d$, meaning that it has at most $d$ real roots. 
 Thus if we create the set $\{0,1,...,100d\}$ there are at most $d$ roots in this set, meaning that the probability or randomly selecting a root is $\frac{1}{100}$ 
 If we have some randomly selected value $\alpha$, we can find the value of $f(\alpha)$ and $g(\alpha)$ with time complexity $O(d)$. If we find that $f(\alpha)\neq g(\alpha)$ then we return false, if $f(\alpha)=g(\alpha)$ then we can try another random value if we want, or if we have done enough trials we can conclude that $f(x)=g(x)$ 
-If we test $c$ of these values we have a probability of less than $(\frac{1}{100})^c$ of returning the wrong answer with a time complexity of $\Theta(cd)$. Its important to note that if $c=d$ then $\Theta(cd)=\Theta(d^2)$  
+If we test $c$ of these values we have a probability of less than $(\frac{1}{100})^c$ of returning the wrong answer with a time complexity of $\Theta(cd)$. Its important to note that if $c=d$ then $\Theta(cd)=\Theta(d^2)$ which is the complexity as the deterministic algorithm.  
 
 
 ## Matrix Equality Verification
-Given three matrices $A,B,C\in M_{n\times n}(\mathbb{Z}/2)$ we want to be able to verify wether $AB=C$. If we were to find this using matrix multiplication it would take roughly $\Theta(n^3)$ operations.
+Given three matrices $A,B,C\in M_{n\times n}(\mathbb{Z}/2)$ we want to be able to verify wether $AB=C$. If we were to find this using matrix multiplication it would take roughly $\Theta(n^3)$ operations(Counting the number of element multiplications which take place).
 But similarly to the polynomial equality verification if $AB=C$ then for all vectors $r$ $ABr=Cr$. 
 We can compute $ABr$ as $A(Br)$ with a time complexity of $\Theta(n^2)$.
 Let $D=AB-C$ and assume that $D\neq 0$ thus there exists at least one element in $D$ that is non-zero, arbitrarily named $d_{11}$.
 We we create a uniformly random vector $r$(filled with ones and zeros) if $Dr\neq 0$ then we return false, if $Dr=0$ then we know that $\Sigma_{j=1}^n d_{1j}r_j=0$ which can be rewritten into $r_1 = -\frac{\Sigma_{j=2}^{n}d_{1j}r_j}{d_{11}}$ the left side either takes a value $0$ or $1$ and the $r_1$ has a 50% chance of taking on that value.
 Thus our algorithm where we plug in $k$ vectors has a time complexity of $\Theta (kn^2)$ and a probability of failure of $(\frac{1}{2})^k$ 
-In line with what we have previously done for any finite field $F$ the given $n$ samples the probability of failure is $(\frac{1}{|F|})^n$. This even holds for continuous matrices which then its often still better to use bit vectors because then the math is super quick
+In line with what we have previously done for any finite field $F$ the given $n$ samples the probability of failure is $(\frac{1}{|F|})^n$. This even holds for continuous matrices which then its often still better to use bit vectors as the inputs because then the math is super quick
 
 
 ## Min-Cut Algorithm
-For a graph the min cut is the minimal set of edges who's removal result in the graph becoming to disjoint connected components. In order to understand this algorithm you need to know what an edge contraction is, for some edge $\{u,v\}$ we contract it by making $u$ and $v$ into a single vertex with all edges connected to $u$ and $v$ now connected to this new vertex. Two vertexes are allowed to have more than one edge connecting them. 
+For a graph the min cut is the minimal set of edges who's removal result in the graph becoming two disjoint connected components. In order to understand this algorithm you need to know what an edge contraction is, for some edge $\{u,v\}$ we contract it by making $u$ and $v$ into a single vertex with all edges connected to $u$ and $v$ now connected to this new vertex. Two vertexes are allowed to have more than one edge connecting them. 
 The algorithm works by uniformly selecting an edge in the graph, and then contracting it. It does this process $n-2$ times until there are two vertices left. The edges between the final two vertices are the edges for our proposed min-cut. It will always return a cut set but not necessarily the minimum one. 
 We can calculate the probability of it returning the min-cut as follows. Let $C$ be the set of edges that constitute the min-cut.
 Let $E_i$ be the event that at step $i$ the edge contracted was not in $C$ and let $F_i-\bigcap_{j=1}^n E_{j}$. If we can calculate $P(F_{n-2})$ then we have calculated the probability of returning the min cut. First we calculate the $P(F_1)=P(E_1)=1-\frac{2k}{nk}$ we get this because if $|C|=k$ then every single vertex of the graph has at least $k$ edges(otherwise we could just cut the vertex edge away). Thus the graph has at least $\frac{nk}{2}$ edges. Thus $P(E_1)=1-\frac{k}{\frac{nk}{2}}=1-\frac{2k}{nk}=1-\frac{2}{n}$. 
@@ -213,7 +213,14 @@ Which is less than $\frac{1}{n}$ so we have proven what is desired
 When we throw $n$ balls independently and uniformly at random into $n$ bins the maximum load is at least $\ln(n)/\ln\ln(n)$ with probability $1-\frac{1}{n}$
 
 We can see that the probability a specific bin has load $M=\ln n/\ln \ln n$ is at least $1/eM!$. In the Poisson case the bins are independent, so the probability that no bin has load $M$ is at most $1-(\frac{1}{eM!})^n$ which is less than $e^{-n/(eM!)}$.
-Now we need to prove that $e^{-n/(eM!)}\leq n^{-2}$ because if we prove that we can use a Poisson approximation we can multiply it by $e\sqrt{n}$ and see that $e\sqrt{n}n^{-2}$ is less than $\frac{1}{n}$. we can prove this is true, but I don't currently understand how.  
+Now we need to prove that $e^{-n/(eM!)}\leq n^{-2}$ because if we prove that we can use a Poisson approximation we can multiply it by $e\sqrt{n}$ and see that $e\sqrt{n}n^{-2}$ is less than $\frac{1}{n}$. 
+We can prove this is true by showing $M!\leq n/2e\ln(n)$ or equivalently $\ln(M!)\leq \ln(n)-\ln(2e)-\ln(\ln(n))$. 
+
+We proved below that $M!\leq e\sqrt{M}(\frac{M}{e})^M$ which can be extended to be $M!\leq M(\frac{M}{e})^M$. Thus we have 
+$$
+\ln(M!)\leq \ln(M)+M\ln(M)-M
+$$
+which we then replace $M$ with $\ln n/\ln \ln n$ which then a ton of algebra works out to be $\leq \ln(n)-\ln(\ln(n))-\ln(2e)$ proving our conjecture
 
 ## Bucket Sort
 Bucket sort is a sorting algorithm with expected time complexity of $\Omega(n)$. It works under the assumption that we have $n=2^m$ elements uniformly distributed on the interval $[0,2^k)$ where $m\leq k$.
@@ -238,9 +245,40 @@ Then using that we are able to prove that $E[f(X^{m}_1,...,X^{m}_1)]\leq e\sqrt{
 
  By the LOTE $E[f(Y^{m}_1,...,Y^{m}_n)]=\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)$ which we can drop all the other terms in that sum and get $\Sigma_{k=0}^{\infty} E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=k]P(\Sigma_{i=1}^{k}Y_i=k)\leq E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]P(\Sigma_{i=1}^{k}Y_i=m)$ Which we know from proving $(Y_1^{m},...,Y_n^{m})|\Sigma_{i=1}^{n}Y_i^{m}=k \sim (X_1^{m},...,X_n^{m})$ that $E[f(Y^{m}_1,...,Y^{m}_n)|\Sigma_{i=1}^{k}Y_i=m]=E[f(X^{m}_1,...,X^{m}_1)]$. 
 
-Thus we know that $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)] P(\Sigma_{i=1}^{k}Y_i=m)$ which since the sum of Poisson random variables is a Poisson random variable we can calculate $P(\Sigma_{i=1}^{k}Y_i=m)=\frac{m^me^{-m}}{m!}$. But we can place a better bound on this using the property that $m!\leq e\sqrt{m}(\frac{n}{e})^m$ we will not prove this property. So now we have proven that $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)]\frac{1}{e\sqrt{m}}$ thus we can now do Poisson approximations!
+Thus we know that $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)] P(\Sigma_{i=1}^{k}Y_i=m)$ which since the sum of Poisson random variables is a Poisson random variable we can calculate $P(\Sigma_{i=1}^{k}Y_i=m)=\frac{m^me^{-m}}{m!}$. But we can place a better bound on this using the property that $m!\leq e\sqrt{m}(\frac{n}{e})^m$ which is proved at the bottom of my notes. So now we have proven that $E[f(Y^{m}_1,...,Y^{m}_n)]\leq E[f(X^{m}_1,...,X^{m}_1)]\frac{1}{e\sqrt{m}}$ thus we can now do Poisson approximations!
 ### Special Case of Poisson Approximation
 If you have some function $f$ that is non-negative such that $E(f((X^{m}_1,...,X^{m}_1)))$ is monotonically increasing or decreasing with respect to $m$ then we know that $E(f(X^{m}_1,...,X^{m}_1))\leq 2 E[f(Y^{m}_1,...,Y^{m}_n)]$. 
 An example of this would be the number of empty bins. As you increase the number of bins the expected number of empty bins decreases monotonically.
 Thus to calculate the probability that given $n$ bins and $m$ balls, we first change the probability of a bin being empty from being the probability $(1-\frac{1}{n})^m$ that is highly dependent on the values of the other bins to $\lambda = ne^{-m/n}$ that is independent. Then we calculate the probability of $k$ bins being empty in the Poisson case as $ne^{-m/n}$ which then we can get an upper bound in the binomial case by calculating $2ne^{-m/n}$
 
+## Bloom Filters
+The purpose of a bloom filter is to speed up the time it takes to determine wether an item is in some form of storage data structure. Examples could be linked lists or hash-maps. It can only confirm that an item isn't in the structure, not that an item is in the structure. 
+
+A bloom filter is an array of $n$ bits which we will denote $A[0]$ to $A[n-1]$. We have $k$ independent hash functions which we assume are uniformly distributed denoted as $h_1,...,h_k$ which map to $\{0,...,n-1\}$. Additionally we have some set of elements $S=\{s_1,...,s_m\}$.
+Every time we add some element to our structure we hash it with every hash function. And set the bits $A[h_i(s_j)]=1$. Now if we want to determine wether something is stored within the structure we has the element and see if the bits it hashes to have been flipped. If all the bits have been flipped then then actually search the array, but if a single bit hasn't been flipped then we know its not in our structure.
+
+We can calculate the probability that a specific bit is still $0$ after we have appended all of the items as. We using the approximation that $1+x=e^{x}$ 
+$$
+\left(1-\frac{1}{n}\right)^{km}\approx e^{-km/n}
+$$
+So the probability of a false positive when we query the array is the probability of no bits are $0$
+$$
+(1-(1-\frac{1}{n})^{km})^k=(1-e^{-km/n})^{k}=(1-p)
+$$
+Now given a specific number of bits $n$ and specific number of elements $m$ we want to find the number hash functions $k$ which minimizes the probability of a false positive. To make it easier we are minimizing the natural log of it, meaning the function is $g=k\ln(1-e^{-km/n})$.
+$$
+\frac{dg}{dk}=\ln(1-e^{-km/n})+\frac{km}{n}(\frac{e^{-km/n}}{1-e^{-km/n}})
+$$
+which we can find(though a bunch of annoying algebra) has a global minimum at $k=\ln(2)(n/m)$. But we obviously have to have a integer number of hash functions.  
+
+# Useful Approximations and Bounds
+These are a few properties which are used repeatedly which are incredibly useful 
+### $1+x\approx e^{x}$
+This holds when $x$ is small. We can easily see this from the Taylor approximation of $e^x=1+x+\frac{x^2}{2!}+...+\frac{x^n}{n!}$ and when $x$ is small parts $\frac{x^2}{2!}+...+\frac{x^n}{n!}$ become incredibly small
+### $H(n)=\Sigma_{i=1}^n \frac{1}{i}=\ln(n)+\Theta(1)$
+We prove this by showing that $\ln(n)+c_1 \leq H(n)$ and that $\ln(n)+c_2 \geq H(n)$. We know that $\ln(n)=\int_{x=1}^{\infty}\frac{1}{x}dx$ which since $\ln(n)$ is monotonic $\int_{x=1}^{\infty}\frac{1}{x}dx\leq \Sigma_{i=1}^n \frac{1}{i}$ because $\Sigma_{i=1}^n \frac{1}{i}$ is the left Riemann sum and $\int_{x=1}^{\infty}\frac{1}{x}dx\geq \Sigma_{i=2}^n \frac{1}{i}$ because $\Sigma_{i=2}^n \frac{1}{i}$ is the right Riemann sum. Thus since it is less than $\ln(n)$ by a constant and more than by a constant our error term is $\Theta(1)$
+### $n!\leq e\sqrt{n}(\frac{n}{e})^n$ 
+The first useful property we have to prove this is $\ln(n!)=\Sigma_{i=1}^n\ln(i)$. Thus just comes from the way multiplication and $\ln()$ interact. 
+Next since $\ln()$ is a concave we have the property that $\int^{i}_{i-1}\ln(x)dx\geq \frac{\ln(i-1)-\ln(i)}{2}$. This it easy to see when you imagine drawing a line and then integrating the rectangle in the middle. 
+Next we can take $\int_1^{n}\ln(x)dx=\Sigma_{i=1}^{n} \int_{i-1}^{i}\ln(x)dx\geq \Sigma_{i=1}^n \frac{\ln(i-1)-\ln(i)}{2}=\Sigma_{i=1}^n\ln(i)+\frac{\ln(n)}{2}$ 
+So we can rewrite $\int_1^{n}\ln(x)dx\geq \Sigma_{i=1}^n\ln(i)+\frac{\ln(n)}{2}$ as $n\ln(n)-n+1\geq \ln(n!)-\frac{\ln(n)}{2}$ using the integral of $\int_1^{n}\ln(x)dx$ and our previously proven property.

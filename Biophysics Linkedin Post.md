@@ -1,0 +1,7 @@
+About a month ago, I had the chance to present some of the biophysics work I’ve been doing with Maya Ryan, Ming Cotten, and David Altman at the Oregon Academy of Science. It has been a really interesting experience being the only mathematician on a team of physicists. I have learned a lot about how lab work actually happens, especially when it comes to experimental design. Being part of the process of shaping experiments instead of only analyzing the data afterward has been a big shift, and a much more satisfying way to work.
+
+I have been using topological data analysis to study the filament networks that come out of gliding filament assays. It has been a great way to see both the strengths and limitations of TDA in practice. One of the more interesting things we have found is that changing ATP concentration leads to clear differences in the topology of these networks, which we visualized with a t-SNE embedding.
+
+Next, I am starting to look at individual filaments as Markov chains, with the goal of estimating parameters from their diffusion behavior.
+
+I also want to thank David Altman for being an incredibly supportive advisor and for making complex biology and physics ideas approachable, and Rachel Brown. Her computer vision course ended up being very useful for this project.
