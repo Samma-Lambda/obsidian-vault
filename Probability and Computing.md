@@ -16,7 +16,7 @@ Given a function $g$ and $f$ we would say that $f$ is $O(g)$ if there exists som
 Given a function $g$ and $f$ we would say that $f$ is $o(g)$ if there exists some $c,n_0 \in\mathbb{R}$ such that $f(n) < c g(n)$ for all $n\geq n_0$
 
 
-## Polynomial Equality Verification
+## Polynomi2903al Equality Verification
 Given two polynomials one factored(in the form of $g(x)=(x-a_1)(x-a_2)...(x-a_n)$) and one in canonical form($f(x)=b_1x^d+b_2x^{d-1}+...+b_n$). To deterministically solve this we would have to factor out the factored form which would take $\Theta(d^2)$ multiplication operations.
 But we can actually solve this non-deterministically, using the fact that if $f(x)=g(x)$ then $f(x)-g(x)=0$. Thus if we plug in some value $\alpha$ and we get $f(\alpha )\neq g(\alpha)$ then we know the polynomials are not equal.
 Additionally since polynomials are closed under addition, we know that $f(x)-g(x)$ is a polynomial with degree at most $d$, meaning that it has at most $d$ real roots. 
