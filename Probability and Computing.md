@@ -264,7 +264,7 @@ $$
 $$
 So the probability of a false positive when we query the array is the probability of no bits are $0$
 $$
-(1-(1-\frac{1}{n})^{km})^k=(1-e^{-km/n})^{k}=(1-p)
+(1-(1-\frac{1}{n})^{km})^k\approx(1-e^{-km/n})^{k}
 $$
 Now given a specific number of bits $n$ and specific number of elements $m$ we want to find the number hash functions $k$ which minimizes the probability of a false positive. To make it easier we are minimizing the natural log of it, meaning the function is $g=k\ln(1-e^{-km/n})$.
 $$
