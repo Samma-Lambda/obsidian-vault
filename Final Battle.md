@@ -21,7 +21,7 @@
 ### Thesis 
 - Colloquium presentation
 ### Work 
-- Do dayton work forms 
+- Do dayton work form once they send me my ID 
 
 ### TA
 - Grade the Hashmap Assignments 
