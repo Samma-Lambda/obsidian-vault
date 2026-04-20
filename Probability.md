@@ -28,7 +28,6 @@ P(A\cap B)=P(A)P(B)
 $$
 This is also equivalent to $P(A|B)=P(A)$
 
-
 ## Random Variables 
 Random variables are a function from our sample space into a measurable space. For the most part this is mapping into $\mathbb{R}$. An example of a random variable might be the number of heads in $n$ coin tosses or the IQ of a randomly picked person. 
 
@@ -82,8 +81,9 @@ $$
 P(T=t)=\int_{-\infty}^{\infty}P(Y=t-x)P(X=x)dx
 $$
 ## Moment Generating Functions
-Often you will want to calculate $E(X^n)$, but rather than recomputing it for every single value you can instead use this technique to calculate this value for every single $n$. 
-In order to do this you take the Taylor series of $M(t)=E(e^{Xt})$ you get $M(t)=\Sigma_n M^{(n)}(t)(0)\frac{t^n}{n!}$. But you also get the effect that $M(t)=\Sigma_x E(X^n)\frac{t^n}{n!}$. Thus this is a way to calculate the $n\text{th}$ moment. This process is typically really annoyed so hopefully I don't have to do it often 
+The moment generating function of a random variable is defined as $M(t)=E[e^{Xt}]$. If you calculate $M^{(n)}(0)$ we then get the value $E[X^{n}]$. This may seem difficult but sometimes it can make calculating the $n$th moment way easier. Additionally it is used in Chernoff Bounds which are incredibly useful. Sometimes you are able to explicitly calculate the value of the $n$th moment as a simple function, but this can be very difficult to do. 
+
+
 
 
 
@@ -142,6 +142,50 @@ The entropy of a probability distribution if the expected entropy of all events 
 
 
 
+# Types of Convergence in Statistics
+There are a few different types of convergence in probability.
+## Converges in Probability
+A sequence of random variables $X_n$ converges in probability to a value $x$ if $P(|X_n-x|)<\epsilon$  $\forall \epsilon >0$ as $n\rightarrow \infty$. An example of this would be if you let $X_n$ be the proportion of heads in $n$ coin tosses
+
+## Almost Sure convergence
+This is where $n\rightarrow \infty$ we see that $P(X_n=x)=1$ where $x$ is just some value. An example of this would be having a head before the $n$th flip 
+
+## Converges in Distribution
+This is where as $n\rightarrow \infty$ a distribution converges to another distribution. An example of this would be the binomial random variable $\text{Bin}(n,\frac{\lambda}{n})$ as $n\rightarrow \infty$ converging to the poisson distribution 
+
+# Notable Convergences
+## Law of Large numbers
+This states that the sample mean of i.i.d random variables $\bar{X}_n$ converges in probability to $E[X]$ as $n\rightarrow \infty$. This is proven using chebyshev's inequality 
+## Central Limit Theorem
+This states that the distribution of the sum of $n$ i.i.d random variables will converge to the normal distribution. This can be proven in a complicated way using MGFs
+## Binomial to Poisson 
+When you take a binomial random variable $\text{Bin}(n,\frac{\lambda}{n})$ as $n\rightarrow \infty$ it converges to the poisson distribution 
+
+
+# Notable Inequalities
+A common effect within statistics is that the estimation of things because better as you get more data. For example the sample mean becomes more and more reliable as the sample size gets larger and larger(because the variance of its distribution gets smaller). 
+## Markovs Inequality
+This inequality states that for random variables $X>0$
+$$
+P(X\ge t)\leq \frac{E[X]}{t}
+$$
+This inequality is used to provide bounds on the probability of large values of $X$, and as a stepping stone for proving future theorems. 
+## Chebyshev Inequality
+This inequality states that 
+$$
+P(|X-E[X]|\ge t)\leq \frac{\text{Var}(X)}{t^2}
+$$
+This is proved using a specific case of Markovs Inequality where you use the random variable  $Y=(X-E[X])^2$. This shows that $P(X-E[X]\ge t)=P(Y\ge t^2)\le \frac{E[X-E[X])]}{t^2}$. This can provide useful bounds of the probability that a random variable strays aways from the expected value.
+## Chernoff Bounds
+This is another specific case of Markov's Inequality. We start with 
+$$P(X>a)=P(e^{tX}>e^{ta})\leq \frac{E[e^{tX}]}{e^{ta}}=\frac{M_{X}(t)}{e^{ta}}$$
+Where $M_X(t)$ is the moment generating function of $X$. This may seem arbitrary but this holds for any $t>0$ so you get to find the minimal $t$ value.  
+## Jensen's Inequality
+This is proven using a Taylor approximation of function. For any convex function we have 
+$$
+E[f(x)]\geq f(E[x])
+$$
+You can prove this using the Taylor expansion, but I am not including the proof 
 
 
 # Next
