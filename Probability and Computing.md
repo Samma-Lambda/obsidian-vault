@@ -273,6 +273,91 @@ $$
 $$
 which we can find(though a bunch of annoying algebra) has a global minimum at $k=\ln(2)(n/m)$. But we obviously have to have a integer number of hash functions.  
 
+# Chapter 7: Markov Chains and Random Walks
+This chapter introduces a new tool to solving algorithms probabilistically called Markov Chains. 
+## Definition of Markov Chain 
+A stochastic process is a collection of random variables $X=\{X(t): t\in T\}$. Often the index $t$ represents time but does not need to. Further if for all $t\in T$, $X(t)$ has a countably infinite support then the stochastic process is a discrete time process. 
+
+If a discrete time stochastic process has the Markov property which is defined as follows$P\left(X(t)=a_t|X(t-1)=a_{t-1},X(t-2)=a_{t-2},...,X(0)=a_0\right)=P\left(X(t)=a_t|X(t-1)=a_{t-1}\right)$
+it is a Markov Chain. 
+
+If our Markov Chain is time homogenous(meaning $P\left(X(t)=a_t|X(t-1)=a_{t-1}\right)$ is the same for all values of $t$ we can create a matrix which encodes the transition probabilities where the entries encode $p_{ij}=P(X_{t}=j|X_{t-1}=i)$  
+which given some starting state represented by a probability vector $x$ we can calculate the $n$ step distribution by computing $xP^{n}$(to prove this you need to do some math but it all works out)
+
+## Properties of Markov Chains
+- **Irreducible:** This means $p_{ij}^n>0$ for some $n$ for all $i$'s and $j$'s. This intuitively means that you can get from any state to another state after some period of time. Interestingly if a Markov chain is irreducible then all states have the same period
+- **Aperiodic:** A chain is a considered aperiodic if every state has period $1$. Intuitively this means that there is no pattern to when you can be in each state, IE it prevents a random walk from being on a specific node only on even time steps. 
+- **Reversible:** A Markov Chain is considered reversible if the following property hold for all sequences $P(X_0=i_0,X_1=i_1,...,X_k=i_k)=P(X_0=i_k,X_1=i_{k-1},...,X_k=i_0)$ 
+- **Time Homogenous:** This means that $P(X_{t}=j|X_{t-1}=i)$ for all $t$ 
+- **Symmetric:** If $p_{ij}=p_{ji}$ for all $i$'s and $j$'s then it is symmetric. Symmetric MC their stationary distribution is uniform. This is easily proven using the detailed balance equations
+
+## Stationary Distributions 
+The stationary distribution of a MC is a probability vector(can be thought of as a probability distribution of starting states) $\pi$ such that $\pi P =\pi$. 
+If the MC is **Aperiodic** and **Irreducible** then for any starting distribution $\pi^{(t)}$ we have the property $\text{lim}_{t\rightarrow \infty}\pi^{(0)}P^{(t)}=\pi$, the convergence rate is exponential(We can prove this using TV distance). We also have a unique stationary distribution. 
+### Detailed Balance Equation
+The detailed balance equation is $\pi_{i}P_{ij}=\pi_{j}P_{ji}$. If a vector $\pi$ satisfies DBE, then it is the stationary distribution(There can be stationary distributions which don't satisfy the DBE though). 
+We can use this to test if a proposed distribution is the stationary distribution. 
+
+
+## Mixing Times 
+It would be useful to be able to see how far the $n$ step distribution of a Markov Chain is from the stationary distribution. But before that we need to be able to measure the distance between distributions. 
+### Total Variation Distance
+We can define a distance metric between two distributions defined as the three equivalent definitions
+- $||\mu - \nu||_{TV}=\text{Max}_{A\subset S}|\mu(A)-\nu(A)|$
+- $||\mu - \nu||_{TV}=\frac{1}{2}\Sigma_{x\in S}|\mu(x)-\nu(x)|$
+- $||\mu - \nu||_{TV}=\text{inf}\{P(X\neq Y): (X,Y)\text{is a coupling of }\mu\text{ and }\nu\}$
+
+Its nice having all of these definitions because we can just pick the one that is most convenient for our use-case. 
+The third definition of TV distance is nice because any coupling you create will be an upper bound on the TV distance. Thus if we can be clever about our couplings we can bound the total variation and the mixing time. A coupling of two random variables $X$ and $Y$ is a joint random variable such that the marginal of $X$ is $\mu$ and the marginal of $Y$ is $\nu$. 
+We always have the independent coupling but we can get clever and make better ones that are not independent. 
+
+
+The maximal distance to stationary is defined as $d(t) = \text{Max}_{j\in S}||\pi_{x_0=j}^{(t)}-\pi||_{TV}$. The mixing time of a Markov Chain is defined as $t_{\text{mix}}(\epsilon)=\text{min}\{t|d(t)\leq \epsilon\}$
+
+### Coupling Methods for mixing times
+A coupling of Markov Chains is defined as pair of stochastic processes $(X_{t},Y_{t})$ where both processes follow the same transition matrix $P$ but can start at different initial conditions.
+
+We know that $||\pi_{x}^{(t)}-\pi_{y}^{(t)}||_{\text{TV}}\leq P(X_{t}\neq Y_{t})$ because every step of the stochastic process is a valid coupling of $\pi_{x}^{(t)}$ and $\pi_{y}^{(t)}$. 
+
+We can always do the independent coupling, but in the case of a lazy random walk(a random walk with a $50\%$ of staying in the same location) we can define a better coupling. We can flip a coin and randomly pick who advances, with the one who doesn't advance staying in the same state. 
+Additionally we add the condition that once they equal each other, they always equal each other transitioning together. This massively decreases $P(X_{t}\neq Y_{t})$ as overtime it becomes smaller and smaller.
+
+
+The coupling time denoted $\tau_{t}=\text{min}\{t\geq 0:X_{t}=Y_{t}|X_{0}=i,Y_{0}=j\}$ 
+We get another bound of $||X_{i}^{(t)}-X_{j}^{(t)}||_{\text{TV}}\leq P(\tau_t>t)$. 
+
+Also know that $d(t)\leq\text{Max}_{i,j\in S}||\pi_{X_0=i}^{(t)}-X_{Y_{0}=j}^{(t)}||_{\text{TV}}$ 
+
+
+
+### Spectral Methods for mixing times
+We know the following facts about the transition matrix $P$ of a Markov Chain 
+- If $\lambda$ is an eigenvalue of $P$ then $|\lambda|\leq 1$ 
+- If $P$ is irreducible then $\lambda=1$ has an eigenspace of $\vec{1}$
+- If $P$ is irreducible and aperiodic then it does not have $-1$ as an eigenvalue 
+
+We can define a new inner product space $(\mathbb{R}^n,<.,.>_{\pi})$. Where $<f,g>_{\pi}=\Sigma_{x\in S}f_x g_x \pi_x$
+
+If our Markov Chain is reversible with respect to $\pi$ then then the following is true
+- $(\mathbb{R}^n,<.,.>_{\pi})$ has an orthonormal basis of eigenvectors $f^{k}$ with associated real eigenvalues $\lambda_k$
+- $P$ can be decomposed into $\frac{p_{ij}^{(t)}}{\pi_{j}}=\Sigma_{k=1}^{n}f_{i}^{k}f_{j}^{k}\lambda_{k}^{t}$
+
+We have something called the separation distance $s(t)=\text{Max}_{j}[1-\frac{p_{ij}^{(t)}}{\pi_{j}}]$ 
+
+We have another bound $||\pi^{(t)}_{X_0=i}-\pi||_{\text{TV}}\leq s(t)$ 
+
+$\lambda_{*}=\text{Max}\{|\lambda_k|:\lambda_{k}\text{ is an eigenvalue and }\lambda_{k}\neq 1\}$ we define the absolute spectral gap as $\gamma_{*}=1-\lambda_{*}$
+
+The relaxation time is defined as $\frac{1}{\gamma_{*}}$
+We get another bound of $t_{\text{mix}}(\epsilon)\leq t_{\text{rel}}\log(\frac{1}{\epsilon \pi_{\text{min}}})$ 
+
+GOOD PROOFS TO DO
+- $d(t+1)\leq d(t)$
+- DBE implies stationary 
+- Proof TV is a distance metric 
+- Prove equivalent definitions of TV distance 
+
+
 # Useful Approximations and Bounds
 These are a few properties which are used repeatedly which are incredibly useful 
 ### $1+x\approx e^{x}$

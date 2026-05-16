@@ -199,4 +199,13 @@ Generalized linear models rather than predicting the data in the form $\beta_0+\
 
 We compute this using $y$ a $n\times 1$ vector of observed values, $\beta$ a $p\times 1$ vector of parameters, $\hat{\beta}$ a $p\times 1$ vector of parameter estimates. The design matrix denoted where $\phi_{aj}(x_{ij})$ is $a$th function on the $j$th predictor variable evaluated on $j$th value of the $i$th observation
 $$\mathbf{Z} = \begin{bmatrix} \phi_{11}(x_{11}) & \cdots & \phi_{p1}(x_{11}) & \phi_{12}(x_{12}) & \cdots & \phi_{pk}(x_{1k}) \\ \phi_{11}(x_{21}) & \cdots & \phi_{p1}(x_{21}) & \phi_{12}(x_{22}) & \cdots & \phi_{pk}(x_{2k}) \\ \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\ \phi_{11}(x_{n1}) & \cdots & \phi_{p1}(x_{n1}) & \phi_{12}(x_{n2}) & \cdots & \phi_{pk}(x_{nk}) \end{bmatrix}
-$$ We then can compute the MLE finding $\hat{\beta}=(Z^{T}Z)^{-1}Z^Ty$   
+$$ We then can compute the MLE finding $\hat{\beta}=(Z^{T}Z)^{-1}Z^Ty$ which gives us coefficients to go in front of each $\phi$ 
+
+## ANOVA Testing
+This is a way of testing wether multiple categories all have the same mean. The null and alternative hypothesis are as follows
+$$
+H_0:\mu_1=\mu_2=...=\mu_n
+$$
+$$
+H_1: H_0 \text{ is not true}
+$$
