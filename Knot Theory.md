@@ -2,47 +2,36 @@
 tags:
   - Pure
 ---
-# Introductory Definitions
+# What is a knot? 
+A knot is the image of an embedding $f:S^1\rightarrow \mathbb{R}^3$ two knots are equivalent if there exists some ambient isotopy between two knots. This definition prevents bad knots from being formed with a few examples below![[Screenshot 2026-07-02 at 4.28.51 PM.png|427]]
 
-## Knots 
-A knot within math if defined as a closed loop in space. This means that knots are strings with no lose ends, they so they are circles altered in some way. 
-![[Screenshot 2025-12-01 at 10.41.48 AM.png]]
+## Representations of knots 
+Due to the difficulty working with $3$ dimensional representations of knots we have developed other representations  
+### Knot Diagram 
+Knot diagrams work in a way similar to the graphic below
+![[Screenshot 2026-07-02 at 11.12.18 AM.png|412]]
+This works by projecting the knot down down into $2$ dimensions, in a way that is injective expect a finite number of double points(these are the knot intersections). At each of these double points we denote one going under vs over to be able to recover the knot. 
+Additionally we assume that these double points are transverse meaning the way that they cross is linearly independent. 
+#### Reidemeister Moves
+Reidemeister moves are moves that you can do on a knot diagram that leave the knot diagram equivalent. Here are the three moves 
+![[Screenshot 2026-07-02 at 11.33.26 AM.png]]
+When defining invariants on knots, you need the invariant to not change under reidemeister moves. Thus the invariant doesn't change under representations   
 
-## Links
-A **Link** are a collection of closed loops connected in some way. It is important to note that a collection of knots and a link are different things as it allows interaction between the knots
-Knots can represented a variety of ways either as string in 3D space(though this is often hard to work with) or a 2D crossing diagram. 
+## Prime Knots and the Connect Sum
+An orientation of a knot is direction that you travel along a knot. If we take two knots with an orientation, we can connect them using an arc like the diagram below. 
+![[Screenshot 2026-07-02 at 11.39.10 AM.png|445]]
+A knot is composite if it can't be represented as the connect sum of two knots. Otherwise it is a prime not 
 
-## Reidemeister Moves 
-Reidemeister Moves otherwise known as R-moves are actions you can do on a knot diagram that leave the knot
-![[Pasted image 20251201120741.png]]
-
-# Knot Invariants 
-Since knots are often incredibly hard to tell apart, its often nice to define **invariants** on them. **Invariants** are functions which map from a knot into some other space such that all equivalent knots have the same output. 
-It is very important that two inequivalent knots can have the same knot invariant and still not be the same, but two knots can't have the same invariant and be the equivalent knots. 
-
-## Crossing Number
-The crossing number of a knot is the minimum number of crossings needed to represent the knot using a knot diagram. This is an invariant, but can often be hard to find but always is the result of a series of R-moves
-
-## Unknotting Number
-This is the number of self intersections that would result in the knot being R-equivalent to the unknot 
-
-## Chirality 
-This is like Chirality in chemistry, this is defined as a knot is equivalent to its mirror image. If a knot is equivalent to its mirror image, then it is considered Achiral. If it is knot equivalent to its mirror image then it is considered chiral. An example of this would be the trefoil knot
-
-
-## $p$-Colorability/Knot Determinate 
-Let $p$ be on odd prime, a knot is considered $p$ colorable if each arc of the diagram can be labeled with $\{0,1,2,...,p\}$ such that 
-1. There are two distinct labels 
-2. At each crossing $2a-b-c\equiv 0 \text{ mod }p$ 
-![[Pasted image 20251201130236.png|300]]
+# Useful Types of Functions
+## Embedding
+Let $X\subset \mathbb{R}^n$ and let $f:X\rightarrow \mathbb{R}^m$ be a diffeomorphism. Then the induced map $f:X\rightarrow f(X)$ is an embedding 
+## Homomorphism
+This is a continuous bijective function with a continuous inverse 
+## Diffeomorphism
+This is a homeomorphism which both $f$ and $f^{-1}$ are smooth
+## Smooth
+A function $f:U\rightarrow \mathbb{R}^n$ is considered smooth if it at every point $p\in U$ if all the partial derivatives exist for all orders. Additionally $U$ must be an open subset of $\mathbb{R}^n$ \
+## Ambient Isotopy 
+This is very similar to a homotopy if is a function 
 
 
-# Knot Representations 
-There are a large way of representing a knot, and while they all represent a closed loop in 3D. There are some invariants that can only be calculated when looking at a knot under a specific representation 
-## 3D space
-This is what a knot is in the "Real World" it is a closed loop. This is a really difficult representation to work with so we have invented other representations ![[Pasted image 20251204202001.png|200]]
-## Crossing Diagram 
-This is typically the easiest way to draw a knot. It shows the crossings and looks like below 
-
-
-# Special Types of Knots

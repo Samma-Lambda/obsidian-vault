@@ -2,18 +2,22 @@
 tags:
 ---
 #domain 
-This is the study of how probability can lead to computational advantages
+This is the study of how utilizing probability can lead to computational advantages
 # Chapter 1: Introduction to Probability 
 In this chapter they introduce basic concepts like the axioms of probability, bayes rule and LOTP. I don't feel the need to go into detail 
+## Types of Randomized Algorithms
+There are two types of randomized algorithms, Monte Carlo algorithms and Las Vegas algorithms. 
+Monte Carlo algorithms have a deterministic time complexity, but a non-deterministic outcome. Examples include Monte-Carlo integration which gives a different result back every time but takes a set amount of time. 
+On the other hand there are Las Vegas Algorithms, which have non-deterministic time complexity but deterministic outcomes. They often on average are faster than deterministic algorithms but there is no guarantee that they will be. An example would be randomized quick-sort. 
+
+## O notation
+Given a function $g$ and $f$ we would say that $f(x)$ is $O(g(x))$ if $|\frac{f(x)}{g(x)}|\leq M$ for all $x\geq x_0$. Intuitively this means that $f(x)$ grows at either a slower or equal rate to $g(x)$. Consequently this means that $\lim_{x\rightarrow \infty}\frac{f(x)}{g(x)}$ either converges to a finite number(IE $\frac{3x^2+5x}{x^2}$), converges to zero(IE $\frac{100}{x}$) or oscillates under some bound(IE $\frac{3x\sin{x}}{x}$. 
+In the case where $\lim_{x\rightarrow \infty}\frac{f(x)}{g(x)}\leq \epsilon$ for all $\epsilon\geq 0$ then we say that $f(x)=o(g(x))$  
+## Omega notation
+This is kinda the opposite of the big O notation. A function $f(x)$ is considered to have $\Omega(g(x))$ if $\lim_{x\rightarrow\infty}|\frac{f(x)}{g(x)}|$ does not converge. Also a function $f(x)=\omega(g(x))$ if $\lim_{x\rightarrow\infty}|\frac{f(x)}{g(x)}|$ diverges 
 
 ## Theta Notation 
-Given a function $g$ and $f$ we would say that $f$ is in $\Theta(g)$ if there exists some $c_1,c_2,n_0 \in\mathbb{R}$ such that $c_1 g(n)\leq f(n) \leq c_2 g(n)$ for all $n\geq n_0$. This can be though of as an exact time complexity rather than a upper or lower bound. Conceptually and definitionally this is a set of functions 
-
-## Big O notation
-Given a function $g$ and $f$ we would say that $f$ is $O(g)$ if there exists some $c,n_0 \in\mathbb{R}$ such that $f(n) \leq c g(n)$ for all $n\geq n_0$. This can be though of as an upper bound of the function. Conceptually and definitionally this is a set of functions 
-
-## Little O notation 
-Given a function $g$ and $f$ we would say that $f$ is $o(g)$ if there exists some $c,n_0 \in\mathbb{R}$ such that $f(n) < c g(n)$ for all $n\geq n_0$
+A function is considered to be $f(x)=\Theta(g(x))$ if and only if $f(x)=O(g(x))$ and $f(x)=\Omega(g(x))$. This means that $\lim_{x\rightarrow\infty}|\frac{f(x)}{g(x)}|$ is some finite number.  
 
 
 
@@ -154,7 +158,7 @@ The second phase is just running the first phase in reverse, since we are at a r
 Thus our algorithm takes less than $60n$ steps with probability $1-O(N^{-1})$. Note since there is $2nN$ directed edges in the graph and we are routing $N$ packets at most at any given moment only $\frac{1}{2}n$ edges are being used
 
 ## Network Routing on a Butterfly Graph
-Choosing to ignore for now 
+NEED TO FINISH
 
 
 # Chapter 5: Balls, Bins, Random Graphs, Poisson Approximation
@@ -271,7 +275,155 @@ $$g=k\ln(1-e^{-km/n})$$
 $$
 \frac{dg}{dk}=\ln(1-e^{-km/n})+\frac{km}{n}(\frac{e^{-km/n}}{1-e^{-km/n}})
 $$
-which we can find(though a bunch of annoying algebra) has a global minimum at $k=\ln(2)(n/m)$. But we obviously have to have a integer number of hash functions.  
+which we can find(though a bunch of annoying algebra) has a global minimum at $k=\ln(2)(n/m)$.But we obviously have to have a integer number of hash functions. 
+## Random Graphs
+Having the poisson approximation is really nice because it allows us to look at abstract away from a complicated case and look at a simpler case and make statements about that instead. 
+It would be useful to have statement like this but for random graphs instead but before that we need to define the two types of random graphs 
+We can either define a random graph as between two nodes there is a probability $p$ that there is an edge, or we can define a graph as there are $n$ edges and they are randomly uniformly placed between edges. We denote the first type of random graph as $G(n,p)$ and the second type of random graph as $G(n,N)$. 
+You may be able to see the connect between these two similar to way that that balls and bins can be instead approximated with the binomial distribution. 
+Some graphs properties are monotonically increasing meaning that if you added an edge to a graph than it would not break the property. An example of this would be a graph containing a degree $n$ cycle, no number of edges you can add will remove this property. There are also monotonically decreasing properties like being cycle free. 
+### The relationship between G(n,p) and G(n,N)
+We can define a nice relationship between $G(n,p)$ and $G(n,N)$ that is there exists some epsilon $\epsilon$ such that for $p^{+}=(1+\epsilon)N/\binom{N}{2}$ and $p^{-}=(1-\epsilon)N/\binom{N}{2}$ 
+$$
+P(n,p^-)-e^{-O(n)}\leq P(n,N)\leq P(n,p^{+})+e^{-O(n)}
+$$
+Where $P$ is the probability of some graph having a monotone increasing trait. This is nice because it allows us to just think about $G(n,p)$ when $n$ gets large.
+
+We can prove this using the following. By the law of total probability $P(n,p^{-})=\Sigma_{k=0}^{\binom{n}{2}}P(n,K)P(X=K)$  where $X$ is a random variable representing the number of edges. Further $P(n,p^{-})=\Sigma_{k\leq N}P(n,K)P(X=K)+\Sigma_{k> N}P(n,K)P(X=K)$
+Since we are looking at a monotone increasing function we know that $P(n,K)\leq P(n,N)$ when $K\leq N$ giving us $\Sigma_{k\leq N}P(n,K)P(X=K)\leq P(X\leq N)P(n,N)$. Additionally $\Sigma_{k> N}P(n,K)P(X=K)\leq P(X> N)$. Thus
+$$
+P(n,p^{-})\leq P(X\leq N)P(n,N)+P(X>N)\leq P(n,N)+P(X>N)
+$$ But nicely we can derive a chernoff bound for $P(X>N)\leq e^{-(1+\epsilon)\epsilon^2N/8}$ showing that $P(n,p^{-})-e^{-O(N)}\leq P(n,N)$ we can do a similar argument to show that $P(n,N)\leq P(n,p^{+})+e^{-O(n)}$. 
+The significance of this is that with sufficiently large $N$ the graphs $G(n,N)$ behave pretty much like $P(n,p^{-})$ 
+### Finding Hamiltonian Cycles
+On a graph a hamiltonian cycle is a cycle that includes every single vertex. There are two algorithms included in the text, one which is better but hard to analyze and one which is worse but easier to analyze. 
+Both use rotation of a path on a graph which is where you have a path $(v_1,v_2,v_3,...,v_n)$ and some edge $(v_i,v_n)$ we rotate the path with this edge by connecting $v_i$ to $v_n$ in the path and then instead making $v_{i+1}$ the end. So our final path would look like $(v_1,v_2,...,v_i,v_n,v_{n-1},v_{n-2},...v_{i+1})$
+#### Algorithm 1
+Input: A graph $G=(V,E)$ with $n$ vertices
+Output: A hamiltonian cycle or FAIL
+1. Pick a random vertex make that the head
+2. Repeat steps $3$ through $6$ until you either have a hamiltonian cycle or there are no unused edges in the head node
+3. Let $P=v_1,v_2,...,v_k$  be the current path let $(v_k,u)$ be the first edge on the in $v_k$ list
+4. Remove $(v_k,u)$ from both $v_k$ and $u$ list
+5. If $u\ne v_i$ for $1\leq i\leq k$ AKA meaning that it is not in the path, add $u$ to the path making it $v_{k+1}$ we we rotate we check to see if we have made a full hamiltonian cycle(by counting the number of nodes in the graph) and seeing if it makes a proper cycle 
+6. Otherwise rotate along the edge $(v_k,u)$. This sets a new node up as the head so we don't get stuck
+#### Algorithm 2
+Input: A graph $G=(V,E)$ with $n$ vertices
+Output: A hamiltonian cycle or FAIL
+1. Start with a random vertex as the head node
+2. Keep doing the following with their respective probabilities until you either find a hamiltonian cycle or the list of the edges from the head node is empty NOTE THAT MULTIPLE OF THESE CAN HAPPEN BECAUSE THEY ARE NOT MUTUALLY EXCLUSIVE
+With probability $1/n$ reverse the path
+With probability $|\text{used edges}(v_k)|/n$ choose a uniformly random used edge from $v_k$ and then rotate the path using it. 
+With probability $1-\frac{1}{n}-\frac{|\text{used edges}(v_k)|}{n}$ select the first unused edge from $v_k$ $(v_k,u)$ if $u$ is not in the path make it the head, otherwise rotate using this edge 
+
+#### The property which makes algorithm 2 nice 
+Proof that being the head node is uniformly distributed among all nodes, thus $P(v_{t+1}=u)=\frac{1}{n}$ 
+The only way the first node $v_1$ can become the head node is by path reversal which happens with probability $\frac{1}{n}$ 
+If the node is in the path and the edge between it and the head node has been used. Then the probability that that edge is selected and used is the probability that the second effect happens $|\text{used edges}(v_k)|/n$ times the probability that specific edge is picked which is $\frac{1}{|\text{used edges}(v_k)|}$ which means that $|\text{used edges}(v_k)|/n \frac{1}{|\text{used edges}(v_k)|}=\frac{1}{n}$
+If the node is in the path and its edge to the head has not been used then we need the second case to trigger which has probability of $1-\frac{1}{n}-\frac{|\text{used edges}(v_k)|}{n}$ and the probability of this edge being picked is uniform across all not picked nodes making it $\frac{1}{n-|\text{used edges}(v_k)|-1}$ thus the probability of this node becoming the head node is $(1-\frac{1}{n}-\frac{|\text{used edges}(v_k)|}{n})(\frac{1}{n-|\text{used edges}(v_k)|-1})=\frac{1}{n}$
+ The same argument can be used if the node is not on the path.
+
+Now because the probability of any node being added to the path is $\frac{1}{n}$ we see that this has the the time complexity of the coupon collector problem meaning it has time complexity of $O(n \text{log}n)$ to make a hamiltonian path and a cycle within $O(n\text{log}n)$
+
+NEED TO FINISH
+# Chapter 6: Probabilistic Method
+The probabilistic method is a technique where you use the probability axioms to prove the existence of an object with a specific probability. 
+## Existence Arguments 
+The following are techniques for proving the existence of objects
+### Basic Counting Arguments
+This is where you define some probability space of objects, and then prove that the probability of a randomly sampled object having a specific property is non-zero. 
+
+#### Complete graphs without monochromatic subgraphs
+An example of this is proving a complete graph $k_n$ has no monochromatic complete subgraphs $k_k$ if $\binom{n}{k}2^{-\binom{k}{2}+1}\leq 1$. 
+
+We start by counting the number of $k_k$ subgraphs where are, and for a complete graph with $n$ vertices there is $\binom{n}{k}$, because there are $\binom{n}{k}$ combinations of $k$ vertices. 
+We define some arbitrary ordering on these subgraphs and define $A_i$ as the event that the 
+$i$th subgraph is monochromatic.
+We can easily calculate the probability of that $A_i$ is monochromatic using the fact that all $\binom{k}{2}$edges must be the same color and there are two colors so there is two ways to achieve this. Thus we get $P(A_i)=2^{-\binom{k}{2}+1}$.
+
+Now we want to calculate the probability that all of these subgraphs are monochromatic which we can get an upper bound on using the union bound. $P(\bigcup_{i=1}^{\binom{n}{k}} A_i)\leq \Sigma_{i=1}^{\binom{n}{k}}P(A_i)=\binom{n}{k}2^{-\binom{k}{2}+1}\leq 1$. The last inequality is one of our assumptions. Thus since the probability that all of the subgraphs are monochromatic is less than one, the probability none of them are is greater than zero. 
+
+### Expectation Argument
+The expectation argument hinges on the fact that there must be some object greater than or equal to the expected value of a discrete random value(if not then the expected value would be lower), and similarly there must be an object less than or equal to the expected value of a discrete random variable. 
+#### Finding a Large Cut
+We can prove using this method that every graph with $m$ edges has a cut(a set of edges that will partition the vertices into two disjoint graphs, but all of them need to be removed for it to achieve this) with at least $m/2$ edges
+We do this by taking all the vertices in each graph and uniformly assigning them to the sets $A$ and $B$. We define another random variable $X_i$ which equals $1$ if edge $i$ connects a node in $A$ to a node in $B$. 
+We can see that $E[X_i]=\frac{1}{2}$ through the simple argument of randomly assign the first node of the edge and the probability it matches is $\frac{1}{2}$. If we let $C(A,B)$ be a random variable representing the value of the cut between $A$ and $B$ we can see that 
+$$
+E[C(A,B)]=E[\Sigma_i^m X_i]=\Sigma_1^m E[X_i]=m\cdot \frac{1}{2}
+$$
+Thus we have proven that there is some cut with edges greater than or equal to $m/2$ 
+
+But this just proves the existence of a cut with this property, if we want to create an algorithm from this we need to find the probability $p=P(C(A,B)\geq \frac{m}{2})$.
+We know that $\frac{m}{2}=E[C(A,B)]=\Sigma_{i<m/2}iP(C(A,B)=i)+\Sigma_{i\geq m/2}iP(C(A,B)=i)$ 
+
+Note that $\Sigma_{i\geq m/2}iP(C(A,B)=i)\leq pm$ because we know that $i\leq m$ because no cuts can have more than the number of edges, and that the sum of  $\Sigma_{i\geq m/2}P(C(A,B)=i)=p$ by the LOTP. 
+
+Similarly $\Sigma_{i< m/2}iP(C(A,B)=i \leq (1-p)(\frac{m}{2}-1)$ because by LOTP $\Sigma_{i< m/2}P(C(A,B)=(1-p)$ and the max value that $i$ can be without being greater than or equal to $m/2$ is $m/2-1$.
+
+Thus $m/2=\Sigma_{i<m/2}iP(C(A,B)=i)+\Sigma_{i\geq m/2}iP(C(A,B)=i)\leq (1-p)(m/2-1)+pm$ which can be rewritten to be $p\geq \frac{1}{m/2+1}$. 
+
+Finally we can easily test wether a partition of the vertices has value greater than $m/2$ so we have a Las Vegas algorithm with a time complexity of the geometric random variable $\text{Geom}(\frac{1}{m/2+1})$ 
+
+#### Maximum Satisfiability
+A satisfiability problem(abbreviated SAT) is a logical expression that is a conjunction of or clauses. An example might be $(x_1 \lor \bar{x_2} \lor x_3)\land(\bar{x_3})\land (x_1 \lor x_2)$. Maximum satisfiability is an algorithm for calculating the maximum number of clauses that can be satisfied in this logical formulation. 
+We can prove that at least $m(1-2^{-k})$ clauses can be satisfied where $k$ is the minimum number of variables in a clause and $m$ is the number of clauses in the expression. The probability that a specific clause is satisfied is $1-2^{k_i}$ because its the complement that none of the variables are what they should be. Note that $\Sigma_{i=1}^{m}(1-2^{-k_i})\geq m(1-2^{-k})$ thus we can satisfy at least $\lceil m(1-2^{-k})\rceil$. 
+We can turn this into a Las Vegas algorithm using 
+
+
+### Sample and Modify 
+This is where we have some larger structure, and then we create some subset of the structure with a specific property, and then modify that structure to have a specific trait. Often structures are hard to work with but substructures are easy to 
+#### Independant Sets
+For a graph $(V,E)$ an independent set is a set of vertices which none of them share edges. 
+
+If we have a graph with $m\geq n/2$ edges where $n$ is the number of vertices we can create an algorithm which generates an independent set of size $\frac{n}{2d}$ where $d=2m/n$ meaning it is average degree of an vertex in our graph. 
+The algorithm works by letting $d=2m/n$ be the average degree of a vertex in $G$. First you delete each vertex of the graph independently with probability $1-\frac{1}{d}$ and also delete all edges connected to it. Then with all the remaining edges randomly delete one of the vertices attached to it. 
+
+Its really easy to see that what will be returned is a set of independent vertices. Now we are gonna analyze the number of vertices outputted from this algorithm.
+Since the probability that a vertex does not get deleted is $\frac{1}{d}$ and there are $n$ edges the expected number of edges that remain is $E[X]=\frac{n}{d}$ 
+Now if $Y$ is the number of edges that survive the first step. There are $\frac{nd}{2}$ edges in the graph and an edge survives if only its two adjacent vertices survive. Thus the expected value of the number of edges that survive is $E[Y]=\frac{nd}{2}(\frac{1}{d})^2=\frac{n}{2d}$
+
+Because each edge remaining at the end removes one vertex, our independent set at the end will have expected value $E[X-Y]=\frac{n}{d}-\frac{n}{2d}=\frac{n}{2d}$ 
+
+### Second Moment Method
+This is derived pretty much just from chebyshev inequality it states that for any integer valued random variable $P(X=0)\leq \frac{\text{Var}(X)}{E[X]^2}$ 
+#### Threshold Behavior on Random Graphs
+Threshold behavior is when a slight change in $p$ for a random graph $G(n,p)$ can result in a trait being almost guaranteed or not likely at all. 
+An example of this would be the existence of a clique of size $4$ within a random graph. When a random graph has probability $o(n^{-2/3})$ then the probability that there is a clique of size $4$ is almost zero, while if it has probability $\omega(n^{-2/3})$ it is almost guaranteed that the graph has a clique of size $4$
+
+Proof that cliques disappear when the probability is $o(n^{-2/3})$ 
+Note that $E[X]=\binom{n}{4}p^6$ where $X$ is the number of cliques of size $4$. Note that $E[X]\propto \binom{n}{4}(n^{-2/3})^6\propto 1$ which we can easily see by approximating the binomial as $n^4$. We can do this because $\binom{n}{4}=\frac{n(n-1)(n-2)(n-3)}{4\cdot3\cdot2\cdot1}$ and the top part works out to have a $n^4$ in it. Thus $E[X]=o(1)$ meaning that $E[X]<\epsilon$ for significantly large $n$. Thus we because $X$ can only take on non-negative integers thus $P(X\geq 1)\leq E[X]<\epsilon$. Thus the probability of a graph having clique of size $4$ is less than epsilon. 
+
+Note that when $p=\omega(n^{-2/3})$ we can easily see that $E[X]\rightarrow \infty$. Thus if we can prove that $P(X=0)=o(1)$ then we have proven our conjecture. Luckily we can use our brand new second moment method to do this. So we just need to prove that $\frac{\text{Var}(X)}{E[X]^2}\leq \epsilon$ which further means that we need to prove that $\text{Var}(X)=o(E[X]^2)$. 
+To do this we prove the use the fact that if $\text{Var}[X]\leq E[X]+\Sigma \text{Cov}(X_i,X_j)$ if $X_i$ is a random variable that can take on values between $0$ and $1$. 
+Now we can attempt to find the value of $\text{Var}[X]=\text{Var}[\Sigma_{1}^{\binom{n}{4}}X_i]\leq \Sigma E[X_i]+\Sigma_{i\neq j} \text{Cov}(X_i,X_j)$. Finding $\Sigma E[X_i]$ is easy because each clique has $6$ edges and we need them to all be present so it is $\binom{n}{4}p^6$ 
+Now to find the covariance we break it up into cases. If two cliques either share $0$ or $1$ vertices then they share no edges are are thus independent. 
+If they share $2$ vertices then they have one common edge and we know that $E[X_iE_j]-E[X_i]E[X_j]\leq E[X_iE_j]$ which we can calculate $E[X_iX_j]\leq p^11$ because we need all edges to be present. There are $\binom{n}{6}$ ways to choose $6$ vertices, $\binom{6}{2;2;2}$ ways to split them between the groups. 
+If they share $3$ vertices then have have $3$ common edges which similarly we see that $E[X_iE_j]-E[X_i]E[X_j]\leq E[X_iE_j]\leq p^{9}$ and there are $\binom{n}{5}$ ways to choose $5$ vertices and $\binom{5}{3;1;1}$ ways to split them. 
+And since there is only $4$ vertices in each clique of size $4$ we have done all the cases. Thus we know that $\text{V}[X]\leq\binom{n}{4}p^6+\binom{n}{6}\binom{6}{2;2;2}p^{11}+\binom{n}{5}\binom{5}{3;1;1}p^{9}=o(n^8p^{12})$. Note that $\binom{n}{4}p^6=o(E[X]^2)$ because $\binom{n}{4}p^6=E[X]^2$ and $\lim_{x\rightarrow\infty}\frac{E[X]}{E[X]^2}=\frac{1}{E[X]}$ which $E[X]$ goes to infinity as we have shown earlier. 
+Note that $\binom{n}{6}=\Theta(n^6)$ and that $\binom{6}{2;2;2}$ can thus we have NEED TO FINISH
+### Lovasz Local Lemma
+Often when we have a set of bad events and want to find the probability that none of these events happen. Without this new lemma we would either have to use a union bound, which would be adding up all of their probabilities. Alternatively we can assume that the events are independent and then multiply their probabilities, but this is a strong assumption. 
+The Lovasz Local Lemma provides more nuanced approach to this. We say that an event $E_{n+1}$ is mutually independent of $E_1,...,E_n$ if $P(E_{n+1}|\bigcap_{j\in[1,n]}E_j)=P(E_{n+1})$. We define a dependency graphs as a graph where $V$ the vertices of the graph representing the events $E_i$ and the edges $E$.Each event $E_i$ is mutually independent of the set of events $E_j$ 
+
+It states that if for some events $E_1,...,E_n$ if 
+1. $\forall i$ $P(E_i)\leq p$ 
+2. The degree of the dependency graph is bounded by $d$ 
+3. $4dp\leq 1$ 
+Then $P(\bigcap_{i=1}^n \bar{E}_i)\geq 0$ 
+#### Edge Disjoint Paths
+Consider $i=1,...,n$ pairs each of which can choose from a collection of $m$ paths denoted $F_i$. We want to create edge disjoint paths between them
+
+If any path from collection $F_i$ shares edges with no more than $k$ paths in $F_j$ where $i\neq j$ and $8nk/m\leq 1$, there is a way to choose $n$ edge disjoint paths connecting the $n$ pairs
+If we consider the probability space defined by each pair picking a random path independently and uniformly. Let $E_{i,j}$ be the event that the pairs $i$ and $j$ pick paths which share at least one edge.
+Since a path in $F_i$ shares no more than $k$ edges with $F_j$ then $p=P(E_{i,j})\leq \frac{k}{m}$. Since $E_{i,j}$ is independant of $E_{k,l}$ if $k\not\in\{i,j\}$ and $l\not\in\{i,j\}$ we have the degree of the dependancy graph $d\leq 2n$ because there are $2n$ combos that don't satisfy this.
+Thus through the Lovasz Local Lemma $4dp=\frac{8nk}{m}\leq 1$  
+
+
+## Turning Existence arguments into algorithms
+It might seem like these existence proofs are not that useful within the context of computer science but that can sometimes become useful algorithms. 
+If you can efficiently randomly sample a space(for example the space of all coloring of a complete graph) and have probability $p$ of finding an object with the properties you desire, you have a Monte-Carlo algorithm with a probability $p$ of success.
+If you have an algorithm that can efficiently determine wether the sampled object has a specific property, you can now construct a Las Vegas algorithm that has time complexity $\text{geom}(p)$ 
 
 # Chapter 7: Markov Chains and Random Walks
 This chapter introduces a new tool to solving algorithms probabilistically called Markov Chains. 
@@ -282,7 +434,8 @@ If a discrete time stochastic process has the Markov property which is defined a
 it is a Markov Chain. 
 
 If our Markov Chain is time homogenous(meaning $P\left(X(t)=a_t|X(t-1)=a_{t-1}\right)$ is the same for all values of $t$ we can create a matrix which encodes the transition probabilities where the entries encode $p_{ij}=P(X_{t}=j|X_{t-1}=i)$  
-which given some starting state represented by a probability vector $x$ we can calculate the $n$ step distribution by computing $xP^{n}$(to prove this you need to do some math but it all works out)
+which given some starting state represented by a probability vector $x$ we can calculate the $n$ step distribution by computing $xP^{n}$(to prove this you need to do some math but it all works out).
+Additionally you can take a Markov Chain and then represent it as a directed graph $(E,V)$ where the edge weights are the probability of transitioning from one state to another. 
 
 ## Properties of Markov Chains
 - **Irreducible:** This means $p_{ij}^n>0$ for some $n$ for all $i$'s and $j$'s. This intuitively means that you can get from any state to another state after some period of time. Interestingly if a Markov chain is irreducible then all states have the same period
@@ -290,6 +443,10 @@ which given some starting state represented by a probability vector $x$ we can c
 - **Reversible:** A Markov Chain is considered reversible if the following property hold for all sequences $P(X_0=i_0,X_1=i_1,...,X_k=i_k)=P(X_0=i_k,X_1=i_{k-1},...,X_k=i_0)$ 
 - **Time Homogenous:** This means that $P(X_{t}=j|X_{t-1}=i)$ for all $t$ 
 - **Symmetric:** If $p_{ij}=p_{ji}$ for all $i$'s and $j$'s then it is symmetric. Symmetric MC their stationary distribution is uniform. This is easily proven using the detailed balance equations
+## Properties of States of Markov Chains
+
+- **Communicating Classes:** Two states are said to communicate with each other if there exists some two way path connecting them. A state is said to be accessible if one state can reach another state. We can make an equivalence relation of the classes which can communicate.
+- 
 
 ## Stationary Distributions 
 The stationary distribution of a MC is a probability vector(can be thought of as a probability distribution of starting states) $\pi$ such that $\pi P =\pi$. 
@@ -298,7 +455,50 @@ If the MC is **Aperiodic** and **Irreducible** then for any starting distributio
 The detailed balance equation is $\pi_{i}P_{ij}=\pi_{j}P_{ji}$. If a vector $\pi$ satisfies DBE, then it is the stationary distribution(There can be stationary distributions which don't satisfy the DBE though). 
 We can use this to test if a proposed distribution is the stationary distribution. 
 
+## Applications
+### SAT-2 Problem
+The goal of the SAT-2 problem is to create a set of boolean assignments, which satisfies a bunch of clauses each with two variables in them. An example might be 
+![[Screenshot 2026-07-04 at 9.01.56 PM.png]]
+The algorithm works by doing the following 
+1. Assign an arbitrary truth assignment
+2. Repeat up to $2mn^2$ the following, find a clause which is not satisfied and then uniformly alter a variable which is not satisfied 
+3. If a valid truth assignment has been found, return it 
+4. Otherwise return that the system is unsatisfiable 
+The core idea is that all the clauses must be satisfied in order to have a satisfying assignment, so you just go wack a mole-ing until you find something that works
+We know that step $2$ takes $O(n^2)$ because there are $n^2$ possible clauses.
+To take about the time complexity and accuracy of this algorithm we are going to define a few random variables.
+Let $S$ be the satisfying assignment of the system, $A_i$ be the current solution set at the $i$th step and let $X_i$ be the number of boolean assignments in $A_i$ which agree with $S$. 
+If $X_0=0$ then we know with $100\%$ probability that $X_1=1$ because changing any clause will increase the number of correct assignments 
+Now for time steps $1\leq x\leq n-1$ we know that $A_x$ disagrees at at least one clause. If both of the clauses disagree then we know that $X_{x+1}=X_x+1$. Otherwise then if a clause is unsatisfied then one may be correct and one be incorrect. In this case then the probability of $X_x$ increasing is $\frac{1}{2}$ and the probability of $X_x$ decreasing is $\frac{1}{2}$, this is a massive underestimation of the algorithm but for the purposes of analyzing it we are using it. 
+So now to analyze the time complexity and accuracy we need to look at this random walk. Now we want to find $h_j$ which is the expected number of steps to reach $n$(thus completing the algorithm) and $Z_j$ which is a random variable representing the number of steps to reach $n$. 
+To start we know that $h_n=0$(because we would have been there) and $h_1=h_0+1$ because we know that $0$ always transitions to $1$. Additionally $E[Z_j]=E[\frac{1}{2}(1+Z_{j-1})+\frac{1}{2}(1+Z_{j+1})]$, but since $E[Z_j]=h_j$ by linearity of expectations $h_j=\frac{h_{j-1}}{2}+\frac{h_{j+1}}{2}+1$. 
+Thus we have the following system of equations $h_n=0$, $h_j=\frac{h_{j-1}}{2}+\frac{h_{j+1}}{2}+1$, $h_0=h_1+1$ which we can solve giving us $h_0=\Sigma^{n-1}_{i=0}(2i+1)=n^2$. Thus we have proven that the expected runtime of this algorithm is $n^2$. 
+Now to talk about this algorithm accuracy, if there is no satisfying assignment the algorithm is always correct. 
+If there is a satisfying assignment we can break up the algorithm into $m$ segments each with $2n^2$ steps in them. Then we get the following probability using Markov's inequality $P(Z>2n^2)\leq \frac{n^2}{2n^2}=\frac{1}{2}$. Since there are $m$ of these steps the probability of all of them failing is $(\frac{1}{2})^m$. Further this means that we can achieve this level of accuracy at an embarrassingly parallel level, by running each $2n^2$ segment separately  
+### SAT-3 problem 
+We can do almost the exact same algorithm as the SAT-2 problem, but when we solve the new system of equations(noting that the probability of choosing the wrong literal being $\frac{1}{3}$ instead of $\frac{1}{2}$) we end of with a algorithm that runs in $\Theta(2^n)$. 
+But since there are only $2^n$ solutions this does not seem much better than just a brute force algorithm. 
+But accounting for two more details, we can actually improve on this algorithm. 
+First when we pick a solution set randomly, the number of satisfied solutions is distributed as $\text{Bin}(n,\frac{1}{2})$. This means that while getting the solution correct randomly is incredibly rare, getting a good solution set(one that has a lot of variables satisfied) is actually pretty likely. 
+Next the Markov Chain actually tends to move down rather than up, meaning its better to reset often than it is to continue with a chain. 
 
+So now we are going to work on an algorithm which using the following steps 
+1. Repeat up to $m$ times, terminating this loop if all clauses are satisfied, start with a random truth assignment and take $3n$ steps
+2. If a valid truth assignment has been found return it
+3. Otherwise return that there is no valid truth assignments
+Now we want to find the value $q$ that is the probability that one of these iterations of the loops finds a satisfying assignment given that there is one. Further let $q_j$ represent the probability that a Markov Chain finds the satisfying assignment, given exactly $j$ variables are incorrect.
+Now see that the following equation represents the probability that one of these walks moves down $k$ and moves up $j+k$ 
+$$
+\binom{j+2k}{k}(\frac{2}{3})^k(\frac{1}{3})^{j+k}
+$$
+So the probability $q_j\geq \text{Max}_{k=0,...,j}\binom{j+2k}{k}(\frac{2}{3})^k(\frac{1}{3})^{j+k}$ because all of these step combinations would lead to a success. We specifically look at the case where $k=j$ meaning that $q_j\geq\binom{3j}{j}(\frac{2}{3})^j(\frac{1}{3})^{2j}$. We then use Stirlings formula(can't find anywhere in the book but it said that they did it)  which states that $m!=\sqrt{2\pi m}(\frac{m}{e})^m(1\pm o(1))$ to approximate $\binom{3j}{j}$. 
+We can see that $\binom{3j}{j}=\frac{(3j)!}{j!(2j)!}\geq \frac{\sqrt{2\pi(3j)}}{4\sqrt{2\pi j}\sqrt{2\pi(2j)}}(\frac{3j}{e})^{3j}(\frac{e}{2j})^{2j}(\frac{e}{j})^j$ which equals $\frac{\sqrt{3}}{8\sqrt{\pi j}}(\frac{27}{4})^j=\frac{c}{\sqrt{j}}(\frac{27}{4})^j$ 
+
+Thus from all that we get $q_j\geq \frac{c}{\sqrt{j}}\frac{1}{2^j}$ with $q_0=1$. Now we want to find the probability of sucess $q$. We can see that $q\geq \Sigma_{j=0}^{n}P(\text{a random assigment has j mismatches with S})\cdot q_j$ this is a $\geq$ because we are using a lower bound of $q_j$. 
+
+
+
+# Markov Chain Mixing times
 ## Mixing Times 
 It would be useful to be able to see how far the $n$ step distribution of a Markov Chain is from the stationary distribution. But before that we need to be able to measure the distance between distributions. 
 ### Total Variation Distance
@@ -356,6 +556,29 @@ GOOD PROOFS TO DO
 - DBE implies stationary 
 - Proof TV is a distance metric 
 - Prove equivalent definitions of TV distance 
+
+
+
+# Chapter 8: Continuous Random Variables
+While discrete random variables are incredibly useful. Often in the real world we are faced with scenarios where. The beginning of this chapter mostly talks about the exponential and uniform distribution but I am not taking notes 
+## Balls and Bins with feedback
+The situation is two bins each one starting with one ball, with bin $1$ gaining a new probability with $\frac{x^p}{x^p+y^p}$ and bin $2$ gaining a new ball with probability $\frac{y^p}{x^p+y^p}$.  If $p>1$ then with probability $1$ there will reach a point where one of the bins gets infinite balls. 
+
+While it seems weird you can actually represent these using exponentials. If bin $1$ obtains its $z$th ball at time $t$ and then obtains its $z+1$th ball at time $t+T_{z}$ with an exponential with parameter $z^p$. At the same time bin $2$ obtains its $z$th ball at time $t$ and then obtains its $z+1$th ball at time $t+U_{z}$ with an exponential with parameter $z^p$. 
+
+If at a given time if bin $1$ has $x$ balls and bin $2$ has $y$ balls then the probability bin $1$ gets the next ball is $\frac{x^p}{x^p+y^p}$. Additionally by the memoryless property the continuous time part does not matter. 
+
+Next we look at something called the saturation time $F_1=\Sigma_{j=1}^{\infty} T_j$ and $F_2=\Sigma_{j=1}^{\infty} U_j$ which has some surprising properties. First the expectation is finite $E[F_1]=E[\Sigma_{j=1}^{\infty} T_j]=\Sigma_{j=1}^\infty\frac{1}{j^p}$ which we can show $\Sigma_{j=1}^\infty\frac{1}{j^p}\leq 1+\int_{u=1}^{\infty}\frac{1}{u^p}=1+\frac{1}{p-1}$ using the idea of stepping on the inside of it. 
+
+Now we just have to find the probability that they are equal, so we assume by way of contradiction they are thus $T_1=\Sigma_{j=2}^{\infty} T_j+\Sigma_{j=1}^{\infty} U_j$ and the probability of $T_1$ equally any specific value is zero thus they do not equal each other. 
+The proof is pretty much done now
+## Poisson Process
+A poisson process is a situation that arises in nature a large amount of the time. Examples include people waiting in a line to be helped, or the amount of alpha particles emitted from radioactive procedures. There are a large number of definitions for it but the more simple one is the following. It is a stochastic counting process 
+1. $N(0)=0$
+2. The time between increments of $N(t)$ are independent identically distributed exponential random variables with parameter $\lambda$ 
+### Facts about Poisson Processes
+1. The sum of two independent poisson processes $N(\lambda_1)$ and $N(\lambda_2)$ results in a poisson process with parameter $N(\lambda_1+\lambda_2)$. The chance of an event being from the first poisson process is $\frac{\lambda_1}{\lambda_1+\lambda_2}$. 
+2. 
 
 
 # Useful Approximations and Bounds
