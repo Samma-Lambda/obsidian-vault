@@ -438,15 +438,19 @@ which given some starting state represented by a probability vector $x$ we can c
 Additionally you can take a Markov Chain and then represent it as a directed graph $(E,V)$ where the edge weights are the probability of transitioning from one state to another. 
 
 ## Properties of Markov Chains
-- **Irreducible:** This means $p_{ij}^n>0$ for some $n$ for all $i$'s and $j$'s. This intuitively means that you can get from any state to another state after some period of time. Interestingly if a Markov chain is irreducible then all states have the same period
+- **Irreducible:** This means $p_{ij}^n>0$ for some $n$ for all $i$'s and $j$'s. This intuitively means that you can get from any state to another state after some period of time. Interestingly if a Markov chain is irreducible then all states have the same period. Finally all Markov Chain is consider irreducible if all the states belong to one communicating class
 - **Aperiodic:** A chain is a considered aperiodic if every state has period $1$. Intuitively this means that there is no pattern to when you can be in each state, IE it prevents a random walk from being on a specific node only on even time steps. 
-- **Reversible:** A Markov Chain is considered reversible if the following property hold for all sequences $P(X_0=i_0,X_1=i_1,...,X_k=i_k)=P(X_0=i_k,X_1=i_{k-1},...,X_k=i_0)$ 
+- **Reversible:** A Markov Chain is considered reversible if the following property hold for all sequences $P(X_0=i_0,X_1=i_1,...,X_k=i_k)=P(X_0=i_k,X_1=i_{k-1},...,X_k=i_0)$
 - **Time Homogenous:** This means that $P(X_{t}=j|X_{t-1}=i)$ for all $t$ 
 - **Symmetric:** If $p_{ij}=p_{ji}$ for all $i$'s and $j$'s then it is symmetric. Symmetric MC their stationary distribution is uniform. This is easily proven using the detailed balance equations
+- **Ergodic:** If every state of a Markov chain is aperiodic and positive recurrent(meaning the individual state are all ergodic) then the chain is ergodic 
 ## Properties of States of Markov Chains
 
 - **Communicating Classes:** Two states are said to communicate with each other if there exists some two way path connecting them. A state is said to be accessible if one state can reach another state. We can make an equivalence relation of the classes which can communicate.
-- 
+- **Recurrent/Transient:** A recurrent state is a state where the probability of returning to a state given infinite time is $1$, where as a transient state is one where the probability of returning to that state is less than $1$ 
+- **Positive/Null Recurrent:** There are some Markov chain state that the probability of returning to them is $1$ but the expected value of the time til returning is unbounded. If the expected return time is unbounded, then the state is known as Null Recurrent. Otherwise it is positive recurrent
+- **Periodic:** A state is considered periodic if it can only be accessed on steps divisive by a specific non-zero number 
+- **Ergodic:** A state that is aperiodic and positive recurrent is considered ergodic 
 
 ## Stationary Distributions 
 The stationary distribution of a MC is a probability vector(can be thought of as a probability distribution of starting states) $\pi$ such that $\pi P =\pi$. 
@@ -494,8 +498,35 @@ $$
 So the probability $q_j\geq \text{Max}_{k=0,...,j}\binom{j+2k}{k}(\frac{2}{3})^k(\frac{1}{3})^{j+k}$ because all of these step combinations would lead to a success. We specifically look at the case where $k=j$ meaning that $q_j\geq\binom{3j}{j}(\frac{2}{3})^j(\frac{1}{3})^{2j}$. We then use Stirlings formula(can't find anywhere in the book but it said that they did it)  which states that $m!=\sqrt{2\pi m}(\frac{m}{e})^m(1\pm o(1))$ to approximate $\binom{3j}{j}$. 
 We can see that $\binom{3j}{j}=\frac{(3j)!}{j!(2j)!}\geq \frac{\sqrt{2\pi(3j)}}{4\sqrt{2\pi j}\sqrt{2\pi(2j)}}(\frac{3j}{e})^{3j}(\frac{e}{2j})^{2j}(\frac{e}{j})^j$ which equals $\frac{\sqrt{3}}{8\sqrt{\pi j}}(\frac{27}{4})^j=\frac{c}{\sqrt{j}}(\frac{27}{4})^j$ 
 
-Thus from all that we get $q_j\geq \frac{c}{\sqrt{j}}\frac{1}{2^j}$ with $q_0=1$. Now we want to find the probability of sucess $q$. We can see that $q\geq \Sigma_{j=0}^{n}P(\text{a random assigment has j mismatches with S})\cdot q_j$ this is a $\geq$ because we are using a lower bound of $q_j$. 
+Thus from all that we get $q_j\geq \frac{c}{\sqrt{j}}\frac{1}{2^j}$ with $q_0=1$. Now we want to find the probability of sucess $q$. We can see that $q\geq \Sigma_{j=0}^{n}P(\text{a random assigment has j mismatches with S})\cdot q_j$ this is a $\geq$ because we are using a lower bound of $q_j$. But since $P(\text{a random assigment has j mismatches with S})=\binom{n}{j}(\frac{1}{2})^n$ then $\Sigma_{j=0}^{n}P(\text{a random assigment has j mismatches with S})=\Sigma\binom{n}{j}(\frac{1}{2})^{j}$  which we can use the binomial theorem on the rewritten $\Sigma\binom{n}{j}(\frac{1}{2})^{j}=\Sigma\binom{n}{j}(\frac{1}{2})^{j}(1)^{n-j}=(1+\frac{1}{2})^n$.
+Thus from all that $$q\geq \frac{1}{2^n}+\Sigma_{j=1}^{n}\binom{n}{j}(\frac{1}{2})^n\frac{c}{\sqrt{j}}\frac{1}{2^j}\geq\frac{c}{\sqrt{n}}(\frac{1}{2})^n \Sigma_{j=0}^{n}\binom{n}{j}(\frac{1}{2})^j(-1)^{n-j}$$
+Which can be further be rewritten as 
+$$
+\frac{c}{\sqrt{n}}(\frac{1}{2})^n \Sigma_{j=0}^{n}\binom{n}{j}(\frac{1}{2})^j(-1)^{n-j}=\frac{c}{\sqrt{n}}(\frac{1}{2})^n(\frac{3}{2})^n=\frac{c}{\sqrt{n}}(\frac{3}{4})^n
+$$
+Thus $q\geq\frac{c}{\sqrt{n}}(\frac{3}{4})^n$. Thus the expected number of tries is less or equal to $\frac{1}{q}$ meaning the expected number of steps is $(3n)\cdot \frac{c}{\sqrt{n}}(\frac{3}{4})^n$ which dropping constants and gives us a expected time complexity of $O(n^{3/2}(\frac{4}{3})^n)$. 
 
+We then can use Markov's inequality so if we run the algorithm for $2$ times the expected value, the probability of failure is $\frac{1}{2}$ so running it again and again gives us the exponentially decaying probability of failure of $(\frac{1}{2})^{-b}$ 
+
+### The Gamblers Ruin
+The gamblers ruin is similar to the coupon collectors problem, meaning that it comes up all the time outside its original context.
+Its modeled by two players each starting with dollars $l_1$ and $l_2$ respectively. Each round the they flip a coin and with probability $\frac{1}{2}$ player $1$ gives player $2$ a dollar, otherwise player $2$ gives player $1$ a dollar. 
+The game ends when one player runs out of money, what we are interested in the probability that a specific player wins. We can easily model this as a Markov Chain that starts at zero and has an equal probability of either moving up or down $1$ with all states being transient expect the absorbing states $l_1$ and $l_2$. 
+
+If we define $W^t$ as the gain of player $1$ after $t$ steps and $q$ as the probability of the Markov Chain being absorbed by $l_1$. Obviously we see that $E[W^t]=0$. Since all states are transient other than $l_1$ and $-l_2$ we see that $E[W^t]=l_1q-l_2(1-q)=0$ which from this we can rewrite this equation to solve for $q=\frac{l_1}{l_2+l_1}$ 
+### Cut property
+While this is not a direct application it is such a useful theorem that I am going to include it in the application section.
+Also rather than proving it I am going to provide a vibe wise explanation of it. 
+Given a set of states $S$ the probability that the set of states is entered, is the probability that it is exited in the stationary distribution. 
+The vibes wise explanation is that if this was not the case it would not be the stationary distribution because more would want to flow in or out. 
+### Simple Queue
+For a simple queue where if there is less then $n$ items in the queue with probability $\lambda$ a new item enters the queue, if there is a non-zero number of items in the queue then with probability $\mu$. With the remaining probability the queue remains unchanged. 
+
+We are curious about the number of customers in the queue $X_t$, so we analyze it as a Markov Chain. Since this Markov Chain is aperiodic and irreducible it has a unique stationary distribution,
+
+We get the system of equations $\pi_0=(1-\lambda)\pi_0+\mu \pi_1$, $\pi_1=\lambda_{pi_{i-1}}+(1-\lambda-\mu)\pi_i+\mu_{\pi_{i+1}}$, and $\pi_n=\lambda \pi_{n-1}+(1-\mu)\pi_n$ 
+
+Which solving gives $\pi_0=\frac{1}{\Sigma_{i=0}^{n}(\frac{\lambda}{\mu})^{i}}$ and $\pi_i=\frac{(\mu/\lambda)^i}{\Sigma_{i=0}^{n}(\frac{\lambda}{\mu})^i}$. Which tells me given a significant time from the beginning of the chain  the probability of there being a specific number of people 
 
 
 # Markov Chain Mixing times
@@ -578,8 +609,43 @@ A poisson process is a situation that arises in nature a large amount of the tim
 2. The time between increments of $N(t)$ are independent identically distributed exponential random variables with parameter $\lambda$ 
 ### Facts about Poisson Processes
 1. The sum of two independent poisson processes $N(\lambda_1)$ and $N(\lambda_2)$ results in a poisson process with parameter $N(\lambda_1+\lambda_2)$. The chance of an event being from the first poisson process is $\frac{\lambda_1}{\lambda_1+\lambda_2}$. 
-2. 
 
+## Types of Queues
+
+
+
+
+# Chapter 10: Entropy, Randomness, and Information
+This chapter thats about a statistic of a random variable known as entropy. It measures how random or unpredictable a random variable is.
+## Entropy Definition 
+Entropy is defined as the following 
+$$H(X)=-\Sigma_xP(X=x)\log_{2}(P(X=x))$$
+which can be interpreted via LOTUS as $H(X)=E[\log_2(\frac{1}{P(X)})]$. We choose the negative log function because we want independent events to be be additive, and we want it to be positively valued. 
+We denote the binary entropy function as $H(p)=-p\log_2 p -(1-p)\log_2(1-p)$ which is the entropy of a coin flip with probability of heads $p$. Note that when you lose log base $2$ entropy is measured in bits. 
+Through a long and not necessarily insightful proof you can prove that $H(X)+H(Y)=H(X+Y)$ if $X$ and $Y$ are independent. 
+## Entropy within a combinatorial Context 
+The first lemma that shows how entropy shows up in a combinatorial context. Suppose that $nq$ is a integer in the range $[0,n]$ then 
+$$
+\frac{2^{nH(q)}}{n+1}\leq \binom{n}{nq}\leq2^{nH(q)}
+$$
+This is immediately apparent if $q=0$ or $q=1$. If $0<q<1$ then we see that
+$$\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\leq\Sigma_{k=0}^{n}\binom{n}{k}q^k(1-q)^{n-k}$$
+because the first part only contains one term from the sum. Then we can use the binomial theorem to get $\Sigma_{k=0}^{n}\binom{n}{k}q^k(1-q)^{n-k}=(q+(1-q))^n=1$. Thus we get $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\leq 1$ which can be rewritten as $\binom{n}{nq}\leq q^{-qn}(1-q)^{-(1-q)n}$ which using the trick $q^{-qn}=(2^{\log_2 q})^{-qn}$ to see that $q^{-qn}(1-q)^{-(1-q)n}=2^{nH(q)}$ thus we have proven the upper bound $\binom{n}{nq}\leq2^{nH(q)}$. 
+
+Now we just need to prove the lower bound. Similar to the proof above we show that $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}$ is the largest term in the sum. I am not going to show the algebra, but because it is the largest term in the sum we get $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\geq \frac{1}{n+1}$ which is the same as $\binom{n}{nq}\geq \frac{q^{-qn}(1-q)^{-(1-q)n}}{n+1}=\frac{2^{nH(q)}}{n+1}$ proving our conjecture.  
+
+Then further, similar to the proof above we get if $0\leq q \leq \frac{1}{2}$ then $\binom{n}{\lfloor nq \rfloor}\leq 2^{nH(q)}$ and if $\frac{1}{2}\leq q \leq 1$ then $\frac{2^{nH(q)}}{n+1}\leq\binom{n}{\lceil nq \rceil}$.
+
+This is important because we know via chernoff bounds that for large number of coin flips that the number of flips that are heads is going to be around $np$ so it will specific be uniformly distributed as one of the $\binom{n}{np}\approx 2^{nH(p)}$ sequences containing this amount   
+
+## Entropy as Randomness
+We have already talked about how entropy is a measure of randomness. But we are going to talk about functions that extract random bits from from a random variable. We call this an extraction function and it is defined as 
+$$
+P(\text{Ext}(X)=y||y|=k)=\frac{1}{2}^k
+$$
+Note that it needs to have this probability otherwise the functions bits would not be independent and uniformly random.
+
+ 
 
 # Useful Approximations and Bounds
 These are a few properties which are used repeatedly which are incredibly useful 
