@@ -459,6 +459,30 @@ If the MC is **Aperiodic** and **Irreducible** then for any starting distributio
 The detailed balance equation is $\pi_{i}P_{ij}=\pi_{j}P_{ji}$. If a vector $\pi$ satisfies DBE, then it is the stationary distribution(There can be stationary distributions which don't satisfy the DBE though). 
 We can use this to test if a proposed distribution is the stationary distribution. 
 
+## Random Walks on Graphs
+Often a Markov Chain can be represented by using random walk on a graph. Because of this it can be useful to have some stronger results about simple random walks on the graph. 
+### Aperiodicity 
+If a random walk is on a non-bipartite undirected graph then the Markov Chain is aperiodic. This is because on an undirected graph there is a cycle of of length $2$(moving to an adjacent node) and a cycle of length $3$ because the graph is non-bipartite. Thus the graph is aperiodic because there are two co-prime cycles
+### Stationary Distribution
+A random walk converges to a the stationary distribution with each entry in the vector representing a specific node with probability $\pi_i=\frac{d(i)}{2|E|}$.
+We can see this by using the handshaking lemma to see that $\Sigma d(v)=2|E|$ thus $\Sigma\pi_i=\Sigma\frac{d(v)}{2|E|}=1$(this is basically saying that the probability of transitioning to a specific node from a random node is the number of edges connected to it over the total number of edges). Thus $\pi_v=\Sigma_{u\in N(v)}\frac{d(u)}{2|E|}\frac{1}{d(u)}=\frac{d(v)}{2|E|}$ is equivalent to the statement $\pi P=\pi$ 
+### Cover time
+The cover time of a graph, is the maximum expected value of the time it would take to visit every vertex. 
+Let $h_{u,v}$ be the expected number of steps to get from node $u$ to node $v$. The commute time of two nodes is $h_{u,v}+h_{v,u}$ and we can show that if $(u,v)\in E$ then $h_{u,v}+h_{v,u}\leq 2|E|$. 
+
+We can prove this by instead of analyzing a Markov chain transversing a undirected graphs nodes, we instead view it as a Markov Chain which the states are the directed edges of the graph. 
+This new Markov Chain will have a uniform stationary distribution. And since the expected return time of a state is the reciprocal of its stationary probability, when we leave node $u$ to $v$ the expected time to return is $2|E|$. This is a massive upper bound on the return time but it is worth it for our next theorem
+
+We can now prove that the cover time of a graph $(V,E)$ is bounded by $2|E|(|V|-1)$. 
+We can create a spanning tree of the graph, and then create a cycle on it, meaning that every single edge is traversed twice(once in each direction). This can be found using depth first search.
+This gives a specfic sequence of vertexes which are visited in order denoted $v_0,v_1,...,v_{2|V|-2}$. Thus we previously proved that the time to get from $v_i$ to $v_{i+1}$ is bounded by $2|E|$ and there are $|V|-1$ pairs thus the commute time is bounded by $2|E|(|V|-1)$ 
+
+But we can push this bound even further with another bound which says the cover time $C_G$ of a graph $G=(V,E)$ with $n$ vertices is bounded by $C_G\leq H(n-1)\text{Max}_{u,v\in V:u\neq v}h_{u,v}$. 
+To make the proof more concise we write that $B=\text{Max}_{u,v\in V:u\neq v}h_{u,v}$. We define some random ordering of the vertices of the graph chosen uniformly among all permutations $[Z_1,Z_2,...,Z_n]$. Let $T_j$ be the time step at which each the first $j$ of the vertices have been visited. And let $A_j$ be the last of the first $j$ vertices($[Z_1,Z_2,...,Z_j]$) visited.
+Note that the cover time $C_G=T_1+(T_2-T_1)+(T_3-T_2)+...+(T_n-T_{n-1})$ if $Z_1$ happens to be the first node chosen then we have $T_1=0$ which happens with probability $\frac{1}{n}$. Next we have is $Z_1$ is not the first node chosen then $T_1\leq B$ because $B$ is the maximum hitting time. Thus $E[T_1]\leq(1-\frac{1}{n})B$ 
+For $(T_{j+1}-T_j)$ we first consider the case where $Z_j$ is not the last element reached in the set $[Z_1,Z_2,...,Z_j]$. If this is the case then $(T_{j+1}-T_j)=0$ and this happens with probability $\frac{j-1}{j}$. The other case is that $Z_j$ is the last element to be seen this happens with probability $\frac{1}{j}$ and $(T_{j+1}-T_j)\leq B$ because it now needs to hit $Z_j$. Thus we can now write the following inequality
+$C_G\leq \Sigma_{j=2}^n \frac{1}{j}B+(1-\frac{1}{n})B=(1+\Sigma_{j=2}^{n}\frac{1}{j})B-\frac{1}{n}B=H(n-1)B$ 
+
 ## Applications
 ### SAT-2 Problem
 The goal of the SAT-2 problem is to create a set of boolean assignments, which satisfies a bunch of clauses each with two variables in them. An example might be 
@@ -529,6 +553,124 @@ We get the system of equations $\pi_0=(1-\lambda)\pi_0+\mu \pi_1$, $\pi_1=\lambd
 Which solving gives $\pi_0=\frac{1}{\Sigma_{i=0}^{n}(\frac{\lambda}{\mu})^{i}}$ and $\pi_i=\frac{(\mu/\lambda)^i}{\Sigma_{i=0}^{n}(\frac{\lambda}{\mu})^i}$. Which tells me given a significant time from the beginning of the chain  the probability of there being a specific number of people 
 
 
+### $s-t$ Connectivity Algorithm 
+This algorithm determines wether there exists a path connecting $s$ and $t$ in a given graph $G=(V,E)$, let $n=|V|$ and $m=|E|$. It works very simply by starting the chain at vertex $s$ and then having it run for $2n^3$ steps and if it has visited node $t$ it returns that there is a path, otherwise it returns that there is no path. 
+If there is no path than the algorithm always returns the correct answer. If there is a path the time taken to travel from $s$ to $t$ then it is bounded by the cover time $2|E|(|V|-1)$ which is less than $2nm\leq n^3$. Now we can use Markov's inequality to which states that if we run it for $2n^3$ steps then we have a probability of failure of at most $\frac{1}{2}$  
+# Chapter 8: Continuous Random Variables
+While discrete random variables are incredibly useful. Often in the real world we are faced with scenarios where. The beginning of this chapter mostly talks about the exponential and uniform distribution but I am not taking notes 
+## Balls and Bins with feedback
+The situation is two bins each one starting with one ball, with bin $1$ gaining a new probability with $\frac{x^p}{x^p+y^p}$ and bin $2$ gaining a new ball with probability $\frac{y^p}{x^p+y^p}$.  If $p>1$ then with probability $1$ there will reach a point where one of the bins gets infinite balls. 
+
+While it seems weird you can actually represent these using exponentials. If bin $1$ obtains its $z$th ball at time $t$ and then obtains its $z+1$th ball at time $t+T_{z}$ with an exponential with parameter $z^p$. At the same time bin $2$ obtains its $z$th ball at time $t$ and then obtains its $z+1$th ball at time $t+U_{z}$ with an exponential with parameter $z^p$. 
+
+If at a given time if bin $1$ has $x$ balls and bin $2$ has $y$ balls then the probability bin $1$ gets the next ball is $\frac{x^p}{x^p+y^p}$. Additionally by the memoryless property the continuous time part does not matter. 
+
+Next we look at something called the saturation time $F_1=\Sigma_{j=1}^{\infty} T_j$ and $F_2=\Sigma_{j=1}^{\infty} U_j$ which has some surprising properties. First the expectation is finite $E[F_1]=E[\Sigma_{j=1}^{\infty} T_j]=\Sigma_{j=1}^\infty\frac{1}{j^p}$ which we can show $\Sigma_{j=1}^\infty\frac{1}{j^p}\leq 1+\int_{u=1}^{\infty}\frac{1}{u^p}=1+\frac{1}{p-1}$ using the idea of stepping on the inside of it. 
+
+Now we just have to find the probability that they are equal, so we assume by way of contradiction they are thus $T_1=\Sigma_{j=2}^{\infty} T_j+\Sigma_{j=1}^{\infty} U_j$ and the probability of $T_1$ equally any specific value is zero thus they do not equal each other. 
+The proof is pretty much done now
+## Poisson Process
+A poisson process is a situation that arises in nature a large amount of the time. Examples include people waiting in a line to be helped, or the amount of alpha particles emitted from radioactive procedures. There are a large number of definitions for it but the more simple one is the following. It is a stochastic counting process 
+1. $N(0)=0$
+2. The time between increments of $N(t)$ are independent identically distributed exponential random variables with parameter $\lambda$ 
+### Facts about Poisson Processes
+1. The sum of two independent poisson processes $N(\lambda_1)$ and $N(\lambda_2)$ results in a poisson process with parameter $N(\lambda_1+\lambda_2)$. The chance of an event being from the first poisson process is $\frac{\lambda_1}{\lambda_1+\lambda_2}$. 
+2. Conditioning on the number of arrivals that happen over a specific time period, they are uniformly distributed over that interval
+
+## Markov Processes
+Before going into queues its useful to learn what a Markov Process is. It is the continuous time version of a Markov Chain with discrete number of states. 
+To model this we have a transition matrix which determines the probability of transitioning from one state to another state(like a Classical Markov Chain) as well as a vector of parameters that determine when the state transitions from one to another denoted $(\theta_0,...,\theta_n)$. The Markov chain remains in state $i$ with an exponential with parameter $\theta_i$. 
+
+This brings up the immediate question of what does the stationary distribution look like? Obviously if they all had the same exponential parameter then it would converge to its normal stationary distribution.
+
+To find this we need to do a kinda annoying proof that I am not going to do right now NEED TO FINISH 
+
+## Markovian Queues
+Now that we have
+
+
+
+# Chapter 10: Entropy, Randomness, and Information
+This chapter thats about a statistic of a random variable known as entropy. It measures how random or unpredictable a random variable is.
+## Entropy Definition 
+Entropy is defined as the following 
+$$H(X)=-\Sigma_xP(X=x)\log_{2}(P(X=x))$$
+which can be interpreted via LOTUS as $H(X)=E[\log_2(\frac{1}{P(X)})]$. We choose the negative log function because we want independent events to be be additive, and we want it to be positively valued. 
+We denote the binary entropy function as $H(p)=-p\log_2 p -(1-p)\log_2(1-p)$ which is the entropy of a coin flip with probability of heads $p$. Note that when you lose log base $2$ entropy is measured in bits. 
+Through a long and not necessarily insightful proof you can prove that $H(X)+H(Y)=H(X+Y)$ if $X$ and $Y$ are independent. 
+### Entropy decreases through functions 
+We can further prove something more useful and profound in the context of machine learning. Given random variable $X$ and another random variable $Y=f(X)$ we can prove that $H(X)\leq H(Y)$ showing that you can't increase entropy. 
+Note that $H(X,Y)=H(X)+H(Y|X)=H(Y)+H(X|Y)$. But since $Y$ is a function of $X$ then we know that $H(Y|X)=0$. Thus $H(X)=H(Y)+H(X|Y)$  and since entropy is always positive for discrete random variables we see that $H(X)\geq H(Y)$ 
+## Entropy within a combinatorial Context 
+The first lemma that shows how entropy shows up in a combinatorial context. Suppose that $nq$ is a integer in the range $[0,n]$ then 
+$$
+\frac{2^{nH(q)}}{n+1}\leq \binom{n}{nq}\leq2^{nH(q)}
+$$
+This is immediately apparent if $q=0$ or $q=1$. If $0<q<1$ then we see that
+$$\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\leq\Sigma_{k=0}^{n}\binom{n}{k}q^k(1-q)^{n-k}$$
+because the first part only contains one term from the sum. Then we can use the binomial theorem to get $\Sigma_{k=0}^{n}\binom{n}{k}q^k(1-q)^{n-k}=(q+(1-q))^n=1$. Thus we get $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\leq 1$ which can be rewritten as $\binom{n}{nq}\leq q^{-qn}(1-q)^{-(1-q)n}$ which using the trick $q^{-qn}=(2^{\log_2 q})^{-qn}$ to see that $q^{-qn}(1-q)^{-(1-q)n}=2^{nH(q)}$ thus we have proven the upper bound $\binom{n}{nq}\leq2^{nH(q)}$. 
+
+Now we just need to prove the lower bound. Similar to the proof above we show that $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}$ is the largest term in the sum. I am not going to show the algebra, but because it is the largest term in the sum we get $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\geq \frac{1}{n+1}$ which is the same as $\binom{n}{nq}\geq \frac{q^{-qn}(1-q)^{-(1-q)n}}{n+1}=\frac{2^{nH(q)}}{n+1}$ proving our conjecture.  
+
+Then further, similar to the proof above we get if $0\leq q \leq \frac{1}{2}$ then $\binom{n}{\lfloor nq \rfloor}\leq 2^{nH(q)}$ and if $\frac{1}{2}\leq q \leq 1$ then $\frac{2^{nH(q)}}{n+1}\leq\binom{n}{\lceil nq \rceil}$.
+
+This is important because we know via chernoff bounds that for large number of coin flips that the number of flips that are heads is going to be around $np$ so it will specific be uniformly distributed as one of the $\binom{n}{np}\approx 2^{nH(p)}$ sequences containing this amount   
+
+## Entropy as Randomness
+We have already talked about how entropy is a measure of randomness. But we are going to talk about functions that extract random bits from from a random variable. We call this an extraction function and it is defined as 
+$$
+P(\text{Ext}(X)=y||y|=k)=\frac{1}{2}^k
+$$
+Note that it needs to have this probability otherwise the functions bits would not be independent and uniformly random.
+Here is a table giving an example of an extraction function
+![[Screenshot 2026-07-09 at 1.22.08 PM.png|301]]
+
+### Extracting fair bits
+Fair bits are incredibly useful and be be used to generate pretty much all forms of discrete randomness. Here we look at a few ways to generate these random bits from other random variables
+#### From Uniform Randomness
+Given a uniform random variable $X$ with support $\{0,...,m-1\}$. Note that this random variable would have entropy $H(X)=\log_2m$. We can create an extraction function that on average outputs at least $\lfloor\log_2 m \rfloor-1=\lfloor H(X)\rfloor-1$ independent unbiased bits.
+
+If $m$ is a power of two then we can just use the binary representation of the output. This always outputs $\log_2 m$ bits. 
+If $m$ is not a power of two, then we can recursively define a function that outputs fair bits. Let $\alpha = \lfloor \log_2 m \rfloor$. If $X\leq 2^\alpha -1$ then we can just output the binary representation of the output. If $X\geq 2^\alpha$ then $X-2^{\alpha}$ is uniformly distributed. Then recursively do the process on this new random variable again. 
+We now create a random variable $Y$ which represents the number of random bits outputted by this function. 
+We can see that $E[Y]\geq \frac{2^\alpha}{m}\alpha+\frac{m-2^{\alpha}}{m}(\lfloor \log_2(m-2^{\alpha}) \rfloor-1$ because $\frac{2^{\alpha}}{m}$ percent of the time we get $\alpha$ random bits out. Then because of our inductive hypothesis the rest of the time we get $\lfloor \log_2(m-2^{\alpha}\rfloor-1$ random bits out 
+#### From Biased Bits
+The idea behind this is if you have a sequence of $n$ bits denoted $\{0,1\}^n$ and you condition on the number of ones within the string, the probability distribution of bit strings of length $n$ with $k$ ones is uniform among all of them. 
+Thus we can define a extraction function which takes in the number of heads $k$, and maps the bit string to one value in the set  $\{0,...,\binom{n}{k}\}$ uniquely. From this we can use our extraction function from the uniform distribution on it. 
+Now that we have the core idea of our extraction function, we now needs to deal with the fact that it is biased and figure out how many bits on average this extraction function is going to output. 
+
+More formally if $Z$ is the number of heads flipped, and $B$ is the number of bits extracted for a given sequence of flips. We can see via the law of total expectation that $E[B]=\Sigma_{k=0}^{n}P(Z=k)E[B|Z=k]$. We can easily find the value of $E[B|Z=k]$ via our previous extraction function and theorem giving us $E[B|Z=k]\geq\lfloor\log_2\binom{n}{k}\rfloor-1$ 
+
+We can get a lower bound on $E[B]$ by having $\epsilon<\text{min}(p-\frac{1}{2},1-p)$. Now we only consider the $k$ values with $n(p-\epsilon)\leq k\leq n(p+\epsilon)$  
+Thus we get $E[B]\geq \Sigma_{k=\lfloor n(p-\epsilon)\rfloor}^{\lceil n(p+\epsilon) \rceil}P(Z=k)E[B|Z=k]$
+We know that $E[B]\geq \Sigma_{k=\lfloor n(p-\epsilon)\rfloor}^{\lceil n(p+\epsilon) \rceil}P(Z=k)(\lfloor\log_2\binom{n}{k}\rfloor-1)$  
+But from the section entropy and combinatorics we know that $\binom{n}{k}\geq\binom{n}{\lfloor n(p+\epsilon) \rfloor}\geq \frac{2^{nH(p+\epsilon)}}{n+1}$   thus we can replace the $\binom{n}{k}$ with $\frac{2^{nH(p+\epsilon)}}{n+1}$ and to deal with the floor we subtract $1$. Additionally since the second part no longer contains a $k$ we get to move it outside of the summation 
+$E[B]\geq(\log_2 \frac{2^{nH(p+\epsilon)}}{n+1}-2)\Sigma_{k=\lfloor n(p-\epsilon)\rfloor}^{\lceil n(p+\epsilon) \rceil }P(Z=k)$ 
+Then using the properties of logs we can break up the fraction in the log and the right side is equivalent to the statement that $P(|Z-np|\leq \epsilon n)$. Since we know that $E[Z]=np$ we can place a chernoff bound on $P(|Z-np|>\epsilon n)$ finding that $P(|Z-np|>\epsilon n)\leq 2e^{-n\epsilon^2/3p}$ 
+This finally gives us $E[B]\geq (nH(p+\epsilon)-\log_2(n+1)-2)(1-2e^{-n\epsilon^2/3p})$ which as $n$ gets sufficiently will converge to $E[B]\geq (1-\delta)nH(p)$    
+
+### Compression
+Another way you can view entropy is information and how effective you can compress that information. For example a random viable with zero entropy would always be the same thus you wouldn't need to encode it. 
+Often when compressing a sequence of random variables its useful to write the code as prefix free. This mans that none of the realizations which we encode are prefixes of another one. This allows us to actively read the bits as a data stream rather than waiting until we have all the bits or not having a unique solution. 
+Within this we are only considering lossless compression algorithms 
+
+#### Definition of a Compression Function
+Within the context of the textbook I am reading a compression function is a function which takes in a sequence of $n$ coin flips aka an element of $\{H,T\}^n$ and outputs a sequence of bits such that every input has a unique output.  
+
+#### Compression Algorithm on Biased Bits
+We want to design a compression algorithm on a stream of biased bits. We want to minimize the expected number of bits used for a specific sequence of $n$ bits. Which we will denote $E[B]$. Right off the bat we can see how probability is involved in this situation. If we have two strings $S_1$ and $S_2$ where $S_1$ is more probable than $S_2$ then we want to the length of the compressed string to be less than it(if we don't have this we could swap their representations and then get a lower number of expected bits). 
+We can break down our compression algorithm using the law of total expectation.
+
+If there are less than $n(p-\epsilon)$ heads then we use an expensive "compression" algorithm where we set the first bit to $1$ and then the rest of the bits to just the exact sequence. This means that we use $n+1$ bits. We can place a chernoff bound on the probability that $P(X<n(p-\epsilon))<e^{-n\epsilon^2/2p}$
+
+Now we need to consider the case where there are more than $n(p-\epsilon)$ $1$'s in our bit string. 
+
+
+
+
+
+ 
+
 # Markov Chain Mixing times
 ## Mixing Times 
 It would be useful to be able to see how far the $n$ step distribution of a Markov Chain is from the stationary distribution. But before that we need to be able to measure the distance between distributions. 
@@ -589,63 +731,6 @@ GOOD PROOFS TO DO
 - Prove equivalent definitions of TV distance 
 
 
-
-# Chapter 8: Continuous Random Variables
-While discrete random variables are incredibly useful. Often in the real world we are faced with scenarios where. The beginning of this chapter mostly talks about the exponential and uniform distribution but I am not taking notes 
-## Balls and Bins with feedback
-The situation is two bins each one starting with one ball, with bin $1$ gaining a new probability with $\frac{x^p}{x^p+y^p}$ and bin $2$ gaining a new ball with probability $\frac{y^p}{x^p+y^p}$.  If $p>1$ then with probability $1$ there will reach a point where one of the bins gets infinite balls. 
-
-While it seems weird you can actually represent these using exponentials. If bin $1$ obtains its $z$th ball at time $t$ and then obtains its $z+1$th ball at time $t+T_{z}$ with an exponential with parameter $z^p$. At the same time bin $2$ obtains its $z$th ball at time $t$ and then obtains its $z+1$th ball at time $t+U_{z}$ with an exponential with parameter $z^p$. 
-
-If at a given time if bin $1$ has $x$ balls and bin $2$ has $y$ balls then the probability bin $1$ gets the next ball is $\frac{x^p}{x^p+y^p}$. Additionally by the memoryless property the continuous time part does not matter. 
-
-Next we look at something called the saturation time $F_1=\Sigma_{j=1}^{\infty} T_j$ and $F_2=\Sigma_{j=1}^{\infty} U_j$ which has some surprising properties. First the expectation is finite $E[F_1]=E[\Sigma_{j=1}^{\infty} T_j]=\Sigma_{j=1}^\infty\frac{1}{j^p}$ which we can show $\Sigma_{j=1}^\infty\frac{1}{j^p}\leq 1+\int_{u=1}^{\infty}\frac{1}{u^p}=1+\frac{1}{p-1}$ using the idea of stepping on the inside of it. 
-
-Now we just have to find the probability that they are equal, so we assume by way of contradiction they are thus $T_1=\Sigma_{j=2}^{\infty} T_j+\Sigma_{j=1}^{\infty} U_j$ and the probability of $T_1$ equally any specific value is zero thus they do not equal each other. 
-The proof is pretty much done now
-## Poisson Process
-A poisson process is a situation that arises in nature a large amount of the time. Examples include people waiting in a line to be helped, or the amount of alpha particles emitted from radioactive procedures. There are a large number of definitions for it but the more simple one is the following. It is a stochastic counting process 
-1. $N(0)=0$
-2. The time between increments of $N(t)$ are independent identically distributed exponential random variables with parameter $\lambda$ 
-### Facts about Poisson Processes
-1. The sum of two independent poisson processes $N(\lambda_1)$ and $N(\lambda_2)$ results in a poisson process with parameter $N(\lambda_1+\lambda_2)$. The chance of an event being from the first poisson process is $\frac{\lambda_1}{\lambda_1+\lambda_2}$. 
-
-## Types of Queues
-
-
-
-
-# Chapter 10: Entropy, Randomness, and Information
-This chapter thats about a statistic of a random variable known as entropy. It measures how random or unpredictable a random variable is.
-## Entropy Definition 
-Entropy is defined as the following 
-$$H(X)=-\Sigma_xP(X=x)\log_{2}(P(X=x))$$
-which can be interpreted via LOTUS as $H(X)=E[\log_2(\frac{1}{P(X)})]$. We choose the negative log function because we want independent events to be be additive, and we want it to be positively valued. 
-We denote the binary entropy function as $H(p)=-p\log_2 p -(1-p)\log_2(1-p)$ which is the entropy of a coin flip with probability of heads $p$. Note that when you lose log base $2$ entropy is measured in bits. 
-Through a long and not necessarily insightful proof you can prove that $H(X)+H(Y)=H(X+Y)$ if $X$ and $Y$ are independent. 
-## Entropy within a combinatorial Context 
-The first lemma that shows how entropy shows up in a combinatorial context. Suppose that $nq$ is a integer in the range $[0,n]$ then 
-$$
-\frac{2^{nH(q)}}{n+1}\leq \binom{n}{nq}\leq2^{nH(q)}
-$$
-This is immediately apparent if $q=0$ or $q=1$. If $0<q<1$ then we see that
-$$\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\leq\Sigma_{k=0}^{n}\binom{n}{k}q^k(1-q)^{n-k}$$
-because the first part only contains one term from the sum. Then we can use the binomial theorem to get $\Sigma_{k=0}^{n}\binom{n}{k}q^k(1-q)^{n-k}=(q+(1-q))^n=1$. Thus we get $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\leq 1$ which can be rewritten as $\binom{n}{nq}\leq q^{-qn}(1-q)^{-(1-q)n}$ which using the trick $q^{-qn}=(2^{\log_2 q})^{-qn}$ to see that $q^{-qn}(1-q)^{-(1-q)n}=2^{nH(q)}$ thus we have proven the upper bound $\binom{n}{nq}\leq2^{nH(q)}$. 
-
-Now we just need to prove the lower bound. Similar to the proof above we show that $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}$ is the largest term in the sum. I am not going to show the algebra, but because it is the largest term in the sum we get $\binom{n}{nq}q^{qn}(1-q)^{(1-q)n}\geq \frac{1}{n+1}$ which is the same as $\binom{n}{nq}\geq \frac{q^{-qn}(1-q)^{-(1-q)n}}{n+1}=\frac{2^{nH(q)}}{n+1}$ proving our conjecture.  
-
-Then further, similar to the proof above we get if $0\leq q \leq \frac{1}{2}$ then $\binom{n}{\lfloor nq \rfloor}\leq 2^{nH(q)}$ and if $\frac{1}{2}\leq q \leq 1$ then $\frac{2^{nH(q)}}{n+1}\leq\binom{n}{\lceil nq \rceil}$.
-
-This is important because we know via chernoff bounds that for large number of coin flips that the number of flips that are heads is going to be around $np$ so it will specific be uniformly distributed as one of the $\binom{n}{np}\approx 2^{nH(p)}$ sequences containing this amount   
-
-## Entropy as Randomness
-We have already talked about how entropy is a measure of randomness. But we are going to talk about functions that extract random bits from from a random variable. We call this an extraction function and it is defined as 
-$$
-P(\text{Ext}(X)=y||y|=k)=\frac{1}{2}^k
-$$
-Note that it needs to have this probability otherwise the functions bits would not be independent and uniformly random.
-
- 
 
 # Useful Approximations and Bounds
 These are a few properties which are used repeatedly which are incredibly useful 
