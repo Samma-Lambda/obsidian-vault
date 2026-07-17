@@ -663,11 +663,76 @@ We can break down our compression algorithm using the law of total expectation.
 
 If there are less than $n(p-\epsilon)$ heads then we use an expensive "compression" algorithm where we set the first bit to $1$ and then the rest of the bits to just the exact sequence. This means that we use $n+1$ bits. We can place a chernoff bound on the probability that $P(X<n(p-\epsilon))<e^{-n\epsilon^2/2p}$
 
-Now we need to consider the case where there are more than $n(p-\epsilon)$ $1$'s in our bit string. 
+Now we need to consider the case where there are more than $n(p-\epsilon)$ $1$'s in our bit string, to denote this case we are setting the first bit to be $0$. Counting the number of sequences in this set we can see that 
+$$
+\Sigma_{j=\lceil n(p-\epsilon)\rceil}^{n}\binom{n}{j}\leq\Sigma_{j=\lceil n(p-\epsilon)\rceil}^{n}\binom{n}{\lceil n(p-\epsilon)\rceil}\leq\frac{n}{2}2^{nH(p-\epsilon)}
+$$
+We get the first inequality because increasing $j$ results in a lower number since $j\geq n/2$ thus we can just leave it the same. We then get the second inequality from our combinatorial identity of entropy and the fact that we are adding it $\frac{n}{2}$ times. 
+Then for each of these sequences we can encode them using $\lfloor nH(p-\epsilon)+\log_2 n\rfloor$ since $2^{\lfloor n H(p-\epsilon)+\log_2 n\rfloor}\geq \frac{n}{2}2^{nH(p-\epsilon)}$. 
+
+Now the we can calculate the expected number of bits used in encoding as $n+1$ bits with probability $e^{-n\epsilon^2/2p}$ and then $nH(p-\epsilon)+\log_2 n +1$ bits with probability $1-e^{-n\epsilon^2/2p}$ which when written out we can see that 
+$$
+(e^{-n\epsilon^2/2p})(n+1)+(1-e^{-n\epsilon^2/2p})(nH(p-\epsilon)+\log_n+1)\leq(1+\delta)nH(p)
+$$
+
+Which is awesome because we got an upper bound, but persuading someone to use this might be hard because we actually don't know what the range of the expected value could be. We can get a lower bound but I am not going to include it now
+
+# Chapter 11: The Monte Carlo Method
+The Monte Carlo Method is a way to approximate the answer to some problem, wether it estimating the value of some irrational number like $\pi$, finding the value of some integral, or answering some combinatorial question. Now we are going to provide a more formal definition to this.
+## $(\epsilon,\delta)$-Algorithms 
+Formally a randomized algorithm gives an $(\epsilon,\delta)$ approximation for the value of $V$ if the output of the algorithm $X$ satisfies $P(|X-V|\leq \epsilon)\geq1-\delta$. The classical example of this would be calculating the value of $\pi$ via simulation, but it can be used to calculate other irrational numbers or find the value of a specific intergral
+
+Further sometimes we care about fully polynomial randomized approximation schemes, we are algorithms which scale polynomially with respect to $\frac{1}{\epsilon}$, $\ln(\delta^{-1})$ and the size of the input $x$. These algorithms are known as FPRAS. 
+
+### FPRAS and $(\delta,\epsilon)$-Algorithms from indictors 
+Further sometimes we care about fully polynomial randomized approximation schemes, we are algorithms which scale polynomially with respect to $\frac{1}{\epsilon}$, $\ln(\delta^{-1})$ and the size of the input $x$. These algorithms are known as FPRAS. 
+
+There is an insanely nice theorem which basically says if you can create I.I.D random variables with $\mu=E[X_i]$ where $\mu$ is what you are trying to calculate or you can find the thing you are trying to using it.  It states that if $m\geq(3\ln(2/\delta)\geq\epsilon)/\epsilon \mu$ then we have the trait that 
+$$
+P(|\frac{1}{m}\Sigma_{i=1}^{m}X_i-\mu|\geq \epsilon\mu)\leq\delta
+$$
+This is derived from a chernoff bound on the binomial and lets us easily create more $(\delta,\epsilon)$-algorithms. 
+
+It also give us an easy means of checking wether a approximation scheme is FPRAS because we need the inequality $m\geq(3\ln(2/\delta)\geq\epsilon \mu)/\epsilon \mu$  to grow as a polynomial 
+
+ 
+### $(\epsilon,\delta)$-Algorithm for $\pi$ 
+If you had some board and some piece of paper on top of the board, and you threw darts at the board to a uniformly random location. We would see that the ratio of hitting the board vs hitting the piece of paper are the ratios of their areas. 
+We can actually use this to calculate $\pi$ if we have a circle of radius $1$ inscribed into a $2\times 2$ square. The diagram for this looks like this 
+![[Screenshot 2026-07-15 at 1.19.17 PM.png]]
+Note that the area of the square is $4$ while the area of the circle is $\pi$ thus the ratio of landing inside of the circle(Easily checked by seeing if $X^2+Y^2\leq 1$) vs landing outside of the circle is $\frac{\pi}{4}$. Thus the expected value of the random variable $I$ which equals $1$ if it lands inside the circle, and $0$ if it lands outside the circle is $\frac{\pi}{4}$.
+Thus by adding up a bunch of identical ones of these variables(created easily through simulation) we can lower the variance. 
+More rigorously if we have a random variable $Z$ that is $1$ if it is in the circle and $0$ if it is outside the circle. If we define $M=\Sigma^{m}_{i=1}Z_i$ then we get our estimate of $\pi$ to be $\frac{4}{m}M$ then using a chernoff bound for a binomial we get that $P(\frac{4}{m}M\geq \epsilon \pi)\leq 2e^{-m\pi \epsilon^2/12}$
+We likely want to frame our $m$ based around $\epsilon$ and $\delta$ which we can by manipulating the equation to be $m\geq\frac{12\ln(2/\delta)}{\pi\epsilon^2}$ 
+
+###  $(\epsilon,\delta)$-Algorithm for the number of solutions to a disjunctive normal form(DNF)
+Disjunctive normal form is the opposite of conjunctive normal form, as it is a collection of and clauses connected by or's an example of this is below
+$$
+(x_1\land x_2\land x_3)\lor(x_1\land \neg x_2)
+$$
+We can see even though they seem similar to CDF they are different in that they always have a solution. We are going to look at a few algorithms which use the Monte-Carlo method to estimate the number of solutions that exist to this system
+#### Naive Algorithm 
+Naively you might just sample from the $2^n$ possible solution sets and then use that as the proportion of the number of samples which solve the problem, and then multiply that by $2^n$. This would hypothetically converge to the correct number. 
+
+To formalize this we have $F$ a DNF formula, and $c(F)$ the number of solutions to the DNF formula. We initialize $X=0$ and then generate $m$ random assignments and increment $X$ whenever a valid solution is generated. We then return $Y=(\frac{X}{m})2^n$ 
+
+We can easily see that each $X_i$ has expected value $\frac{c(F)}{2^n}$ thus $E[X]=\frac{m\cdot c(F)}{2^n}$ and further $E[Y]=c(F)$
+
+But we want this to be a FPRAS so we need to check if  $m\geq(3\ln(2/\delta))/\epsilon^2 \mu$ grows polynomially. We don't really care what the $\delta$ and $\epsilon$ are but we do care what the average is. This gives us 
+$$
+\frac{3\cdot2^n\ln(2/\delta)}{\epsilon^2 c(F)}
+$$
+so in order for this to be a polynomial scheme we would need $c(F)\geq 2^n/\alpha(n)$ to be able to cancel the exponential on top. But this might not be the case thus this is not a FRPAS algorithm. 
+
+#### FPRAS Algorithm 
+The problem with the previous algorithm is that is not actually utilizing any of our DNF structure. The idea behind it if you have a satisfying assignment for a single clause $(X_1\land...\land X_m)$ we have all of the literals that are not included in the as free variables. Thus we can get an upper bound on the number of solutions, by just adding up these counts for each. We then from that sample space estimate how many duplicates there are. 
+The way that we do this is define a set $U=\{(i,a)|1\leq i\leq t\text{ and } a\in SC_i\}$ and then try to find a set that removes duplicates by only having the assignment that has the greatest number $S=\{(i,a)|1\leq i\leq t, a\in SC_i,a\not\in SC_j\text{ for }j\leq i\}$. Then we find the ratio of $\frac{|S|}{|U|}$ and use that estimate the number of solutions.
+Now we just need to be able to sample uniformly from $U$ and be able to determine wether an element is in $S$. Being able to determine wether an element is in $S$ is pretty easy we just look down the line and see if it satisfies anything. Then to be able to sample uniformly 
 
 
-
-
+More Formally we start with a DNF formula $F$ and initialize a variable $X$ to $0$. Let $SC_i$ be the set of all literal values which satisfy the $i$th clause. We then randomly select a clause with probability $|SC_i|/\Sigma^{t}_{i=1}|SC_i|$ and choose a uniformly random valid assignment $a\in SC_i$. We can easily solve calculate $|SC_i|$ as $2$ to the power of the number of literals not in the clause. 
+Then we test and see if $a$ is not in $SC_j$, $j<i$, then we increment $X$. Our final solution is $Y=(\frac{X}{m})\Sigma_{i=1}^{t}|SC_i|$. 
+This all works because we can easily calculate $\Sigma_{i=1}^{t}|SC_i|$ and then estimate the proportion of them that are double counted. Now we need to prove that it runs in polynomial time. 
 
  
 
