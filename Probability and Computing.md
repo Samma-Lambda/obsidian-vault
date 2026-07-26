@@ -727,18 +727,111 @@ so in order for this to be a polynomial scheme we would need $c(F)\geq 2^n/\alph
 #### FPRAS Algorithm 
 The problem with the previous algorithm is that is not actually utilizing any of our DNF structure. The idea behind it if you have a satisfying assignment for a single clause $(X_1\land...\land X_m)$ we have all of the literals that are not included in the as free variables. Thus we can get an upper bound on the number of solutions, by just adding up these counts for each. We then from that sample space estimate how many duplicates there are. 
 The way that we do this is define a set $U=\{(i,a)|1\leq i\leq t\text{ and } a\in SC_i\}$ and then try to find a set that removes duplicates by only having the assignment that has the greatest number $S=\{(i,a)|1\leq i\leq t, a\in SC_i,a\not\in SC_j\text{ for }j\leq i\}$. Then we find the ratio of $\frac{|S|}{|U|}$ and use that estimate the number of solutions.
-Now we just need to be able to sample uniformly from $U$ and be able to determine wether an element is in $S$. Being able to determine wether an element is in $S$ is pretty easy we just look down the line and see if it satisfies anything. Then to be able to sample uniformly 
+Now we just need to be able to sample uniformly from $U$ and be able to determine wether an element is in $S$. Being able to determine wether an element is in $S$ is pretty easy we just look down the line and see if it satisfies anything. Then to be able to sample uniformly is also pretty easy, we just count the the number of solutions per clause and then select a literal solution from that clause with the proportion of solutions that the clause has in the set $U$ 
 
 
-More Formally we start with a DNF formula $F$ and initialize a variable $X$ to $0$. Let $SC_i$ be the set of all literal values which satisfy the $i$th clause. We then randomly select a clause with probability $|SC_i|/\Sigma^{t}_{i=1}|SC_i|$ and choose a uniformly random valid assignment $a\in SC_i$. We can easily solve calculate $|SC_i|$ as $2$ to the power of the number of literals not in the clause. 
-Then we test and see if $a$ is not in $SC_j$, $j<i$, then we increment $X$. Our final solution is $Y=(\frac{X}{m})\Sigma_{i=1}^{t}|SC_i|$. 
-This all works because we can easily calculate $\Sigma_{i=1}^{t}|SC_i|$ and then estimate the proportion of them that are double counted. Now we need to prove that it runs in polynomial time. 
+ Formally we start with a DNF formula $F$ and initialize a variable $X$ to $0$. Let $SC_i$ be the set of all literal values which satisfy the $i$th clause. We then randomly select a clause with probability $|SC_i|/\Sigma^{t}_{i=1}|SC_i|$ and choose a uniformly random valid assignment $a\in SC_i$. We can easily solve calculate $|SC_i|$ as $2$ to the power of the number of literals not in the clause. 
+Then we test and see if $a$ is not in $SC_j$, $j<i$, then we increment $X$. Our final solution is $Y=(\frac{X}{m})\Sigma_{i=1}^{t}|SC_i|$. It works because we are getting an estimate of the ratio $\frac{|S|}{|U|}$ 
 
- 
+ Now all that is left is to prove this algorithm runs in polynomial time. We know that the probability an element belongs to $S$ is at least $\frac{1}{t}$. Thus if we let $m=\lceil\frac{3t}{\epsilon^2}\ln(\frac{2}{\delta})\rceil$ we have a polynomial approximation algorithm. 
 
-# Markov Chain Mixing times
+### $(\delta,\epsilon)$-Algorithm for the number of independent sets of a graph
+This algorithm relies on the assumption that we have a FPAUS algorithm for independent sets of a graph we denote the set of independent sets $\Omega(G)$. 
+The first definition that we need is for a graph with $m$ vertices denoted $G_m$ and to create some ordering on the edges of $G_m$ we then create a set of graphs $\{G_m,G_{m-1},G_{m-2},...,G_0\}$ where $G_{m-j}$ has the $j$ greatest edges removed. 
+We then notice that $|\Omega(G)|=\frac{|\Omega(G_m)|}{|\Omega(G_{m-1})|}\times\frac{|\Omega(G_{m-1})|}{|\Omega(G_{m-2})|}\times\frac{|\Omega(G_{m-2})|}{|\Omega(G_{m-3})|}\times...\times \frac{|\Omega(G_{1})|}{|\Omega(G_{0})|}\times|\Omega(G_0)|$ by looking at the way that they cancelled. We can easily calculate $|\Omega(G_0)|=2^m$ because there are no edges thus every single set is independent.
+
+We denote $r_i$ to be the ratio of $\frac{|\Omega(G_{i})|}{|\Omega(G_{i-1})|}$ and we can estimate it using the FPAUS by finding creating an independent set in $\Omega(G_{i-1})$ and then testing if it is an independent in $\Omega(G_i)$. 
+The algorithm below gives a $(\epsilon/2m,\delta/m)$-estimate of the true value 
+1. initialize $X=0$  
+2. Repeat $M=\lceil1296m^2\epsilon^{-2}\ln(2m/\delta)\rceil$ times. Generate a $(\epsilon/6m)$-uniform sample from $\Omega(G_{i-1})$, if the sample is also independent in $\Omega(G_{i})$ then increment $X$
+3. return $\bar{r_i}$ as $\frac{X}{M}$ 
+#### Proof that our algorithm actually returns an polynomial approximation
+The first thing that we do is show that the ratio of $r_i$ does not decay exponentially like in the naive implementation of counting solutions of the DNF. 
+To do this we note that $G_i$ and $G_{i-1}$ differ by only a single edge which we will call $(u,v)$. Since adding an edge can only disqualify a graph we know that $\Omega(G_i)\subset \Omega(G_{i-1})$. 
+Thus an independent set in $\Omega(G_i)/\Omega(G_{i-1})$ contains both the vertices $u$ and $v$ this means that for all $I\in\Omega(G_i)/\Omega(G_{i-1})$ we can construct an element $I/ \{v\}\in\Omega(G_i)$. Thus we have a $1$ to $1$ mapping $I^{\prime}\in \Omega(G_i)$ mapped to $I^{\prime}\cup \{v\}\in\Omega(G_{i-1})/\Omega(G_i)$. Thus we know that the cardinality of $\Omega(G_i)/\Omega(G_{i-1})$ is less than or equal to the cardinality of $\Omega(G_i)$ thus stating that $|\Omega(G_i)/\Omega(G_{i-1})|\leq\Omega(G_i)$. Which then from the statement $r_i=\frac{\Omega(G_i)}{\Omega(G_{i-1})}=\frac{|\Omega(G_i)|}{\Omega(G_i)+\Omega(G_{i-1})/\Omega(G_i)}\geq \frac{1}{2}$. Thus we don't have to worry about the exponentially decaying probability as we increase the size 
+
+Now that we have proved it works in polynomial time we need to prove that it actually provides the estimation that we said it does.
+I UNDERSTAND TO HERE
+
+By the definition of a FPAUS we know that 
+$$
+|P(X_k=1)-\frac{|\Omega(G_i)|}{\Omega(G_{i-1})}|\leq\frac{\epsilon}{6m}
+$$
+Where $X_k$ is the indicator variable that denotes if the $k$th sample from $\Omega(G_{i-1})$ is a independent set in $\Omega(G_i)$. Which since $X_k$ is an indicator we know that $E[X_k]=P(X_k=1)$ which then by linearity we have that $|E[\frac{\Sigma_{k=1}^{M}X_i}{M}]-\frac{|\Omega(G_i)|}{\Omega(G_{i-1})}|\leq \frac{\epsilon}{6m}$ which gives us $|E[\bar{r_i}]-r_i|\leq\frac{\epsilon}{6m}$.
+Now rearranging we get $E[\bar{r_i}]\geq r_i-\frac{\epsilon}{6m}\geq \frac{1}{3}$ given that $r_i\geq \frac{1}{2}$. Then using the nice theorem we have about turning indicators into algorithms we get that if $M\geq\frac{3\ln(2m/\delta)}{(\epsilon/12m)^2(1/3)}$ which the latter half can be rearranged to be $1296m^2\epsilon^{-2}\ln(\frac{2m}{\delta})$ we get the equation 
+$$
+P(|\frac{r_i}{E[\bar{r_i}]}-1|\geq\frac{\epsilon}{12m})=P(|r_i-E[\bar{r_i}]|\geq\frac{\epsilon}{12m}E[\bar{r_i}])\leq\frac{\delta}{m}
+$$
+which we can equivalently see that with probability $1-\frac{\delta}{m}$ then $1-\frac{\epsilon}{12m}\leq\frac{\bar{r_i}}{E[\bar{r_i}]}\leq1+\frac{\epsilon}{12m}$ just by expanding it and reversing it. but since $|E[\bar{r_i}]-r_i|\leq\epsilon/6m$ we can get the equation
+$$
+1-\frac{\epsilon}{6mr_i}\leq\frac{E[\bar{r_i}]}{r_i}\leq1+\frac{\epsilon}{6mr_i}
+$$
+which using the fact that $r_i\geq\frac{1}{2}$ we get the equation $1-\frac{\epsilon}{3m}\leq\frac{E[\bar{r_i}]}{r_i}\leq1+\frac{\epsilon}{3m}$ which then we combine the equations $1-\frac{\epsilon}{3m}\leq\frac{E[\bar{r_i}]}{r_i}\leq1+\frac{\epsilon}{3m}$ and $P(|\frac{r_i}{E[\bar{r_i}]}-1|\geq\frac{\epsilon}{12m})=P(|r_i-E[\bar{r_i}]|\geq\frac{\epsilon}{12m}E[\bar{r_i}])\leq\frac{\delta}{m}$ which gives us the following statement with probability $1-\delta/m$
+$$
+1-\frac{\epsilon}{2m}\leq(1-\frac{\epsilon}{3m})(1-\frac{\epsilon}{12m})\leq\frac{\bar{r_i}}{r_i}\leq(1+\frac{\epsilon}{3m})(1+\frac{\epsilon}{12m})\leq1+\frac{\epsilon}{2m}
+$$
+which gives us our desired approximation $(\epsilon/2m,\delta/m)$-approximation. And since the number of samples is polynomial in all the required aspects it is a polynomial algorithm 
+
+
+
+
+
+## Fully Polynomial Almost Uniform Sampler (FPAUS)
+Often we want to sample uniformly from a space, but often its difficult to do this for more complicated spaces. An example of this would be the set of all independent sets on a graph. 
+Because often it might not be possible to get a uniform sampling we abstract the definition of a uniform sampling with the following 
+#### Definition of FPAUS
+If we let $w$ be the random variable representing the output of our algorithm from some sampling space $\Omega$. Our algorithm generates a $\epsilon$-uniform sample of $\Omega$ if for any $S\subset \Omega$ it satisfies 
+$$
+|P(w\in S)-\frac{|S|}{|\Omega|}|\leq\epsilon
+$$
+It becomes fully polynomial almost uniform sampler if the algorithm runs in time that is polynomial in $\ln\epsilon^{-1}$ and the size of the input $x$ 
+
+
+#### FPAUS on Independent sets 
+We can use the Markov Chain Monte Carlo Technique to generate uniformly distributed independent sets. We use the following algorithm
+1. $X_0$ is an arbitrary independent set in $G$
+2. Next pick a random vertex $v$, if it is not in the set and can be added to the set without making it not an independent set make it $X_{i+1}$, if it is in the set remove it making that $X_{i+1}$ 
+3. Otherwise $X_{i+1}=X_{i}$ 
+We can see that this is a Markov Chain Monte Carlo Algorithm. If an independent set is not a neighbor of the current one the probability of transitioning to it is zero. Next The probability of moving to a neighbor is $\frac{1}{|V|}$ because it requires the Markov Chain to select the right vertex(this provides an upper bound because the most neighbors a state can have is $|V|$ so in this cause our $M=|V|$. Then since we only stay in the same location if the vertex fails then we have a probability of staying in the same location with $1-N(x)/M$
+## Markov Chain Monte Carlo Method
+This is a method where we use a Markov Chain moving around some space, and then use the location of this Markov Chain as a way of sampling from a specific distribution.  It works by having a Markov Chain start in some state $X_0$ and then transition and then after a set amount of time the step $X_k$ distribution follows some distribution. We can use the mixing times of Markov Chains to figure out what how long we need to run them for.
+
+We can create these by defining some state space $\Omega$. We then create an undirected graph $(V,E)$ representing our Markov Chain and denote the set of neighbors of some vertex $x$ as $N(x)$. We make it undirected so that it is irreducible. We can make any walk converge to a uniform distribution by using the following rule where $M$ is greater than $\text{max}_{x\in \Omega}|N(x)|$  
+$$
+P_{x,y}=\begin{cases} \frac{1}{M} & \text{if } x\neq y\text{ and }y\in N(x) \\ 0 & \text{if } x\neq y \text{ and }y\notin N(x) \\ 1-N(x)/M & \text{if }x=y\end{cases}
+$$
+This works because of the detail balance equations says something is the stationary distribution if $\pi_xP_{x,y}=\pi_yP_{y,x}$ and since $\pi_x=\pi_y$ then the stationary distribution is uniform  
+
+## Metropolis Algorithm 
+Now that we have created an algorithm which we can use to sample uniformly from a distribution, it is a natural question of wether we can make a algorithm who samples according some some other distribution. 
+We would achieve this by changing what the stationary distribution of the Markov Chain. We can do this using a function which takes in some state $x$ denoted $b(x)$, this could be something like the number of elements in an independent set making it biased towards larger sets. 
+If $B=\Sigma_{x\in \Omega}b(x)$ then it will have stationary distribution $\pi_x=b(x)/B$ if we use the following algorithm 
+$$
+P_{x,y}=\begin{cases} \frac{1}{M}\text{Min}(1,\pi_y/\pi_x) & \text{if } x\neq y\text{ and }y\in N(x) \\ 0 & \text{if } x\neq y \text{ and }y\notin N(x) \\ 1-\Sigma_{y\neq x}P_{x,y} & \text{if }x=y\end{cases}
+$$
+We can see this by using the detailed balance equations. Note that if $x\neq y$ and $\pi_x\leq\pi_y$ then $P_{x,y}=1$ and $P_{y,x}=\pi_x/\pi_y$. This means that $\pi_xP_{x,y}=\pi_x\cdot 1=\pi_y(\pi_x/\pi_y)=\pi_yP_{y,x}=\pi_x$ meaning it satisfies the detailed balance equation, next if $\pi_x>\pi_y$ then we can make pretty much the exact same argument showing that it is the stationary distribution.
+
+This algorithm uses a common technique where you select a neighbor with probability $\frac{1}{M}$ and then accept that neighbor with probability $\text{min}(1,\pi_y/\pi_x)$
+
+### An example with independent sets
+This can allow you to create really cool sampling algorithms such as an algorithm for sampling independent sets where there is a probability of a specific set $I$ is proportional to $\lambda^{|I|}$ where $\lambda >0$. The algorithm runs as follows 
+1. $X_0$ is an arbitrary independent set in $G$
+2. Choose a vertex $v$ randomly if it is in the independent set remove it with probability $\text{min}(1,\frac{1}{\lambda})$, if adding $v$ would make a new independent set add it with probability $\text{Min}(1,\lambda)$ otherwise set $X_{i+1}=X_{i}$ 
+Its important to note that from this chain we never actually need to calculate $B$ thus making this algorithm possible for complicated or large spaces. 
+
+If we have chosen to remove a set the chance of us choosing that specific vertex is $\frac{1}{M}$ and then we want the ratio of $\frac{\pi_y}{\pi_x}$ to be proportional to $\frac{\lambda^{|y|}}{\lambda^{|x|}}=\frac{\lambda^{|x|-1}}{\lambda^{|x|}}=\frac{1}{\lambda}$. Thus when it is removed it transitions with the proper probability.
+
+If we are adding a random vertex that would keep it a independent set then again the probability of accepting that we want it to be $(\frac{1}{M})\text{min}(1,\pi_y/\pi_x)$ and the probability of selecting the specific vertex is $\frac{1}{M}$, Then similarly we see that if we are transitioning from state $x$ to state $y$ where $y$ has one more vertex means that $\frac{\pi_y}{\pi_x}=\frac{\lambda^{|x|+1}}{\lambda^{|x|}}$  
+
+Thus our model works 
+
+# Chapter 12: Markov Chain Mixing times
 ## Mixing Times 
-It would be useful to be able to see how far the $n$ step distribution of a Markov Chain is from the stationary distribution. But before that we need to be able to measure the distance between distributions. 
+It would be useful to be able to see how far the $n$ step distribution of a Markov Chain is from the stationary distribution. Especially considering the last section where we we focused on using the stationary distribution to generate random elements from a specific space.
+Within this we study things like 
+$\Delta_x(t)=||p^{t}_x-\bar{\pi}||$ which is the total variation distance between the Markov Chain starting at state $x$ and the stationary distribution. $\Delta(t)=\text{Max}_{x\in S}\Delta_x(t)$ is known as the maximal distribution. It tells us how close to random we are. 
+
+Then we also care about $\tau_x(\epsilon)=\text{min}\{t:\Delta_x(t)\leq \epsilon \}$ and $\tau(\epsilon)=\text{Max}_{x\in S}\tau_x(\epsilon)$ which is a function of the total variation distance that returns the number of steps that we need to get within epsilon of random.  
 ### Total Variation Distance
 We can define a distance metric between two distributions defined as the three equivalent definitions
 - $||\mu - \nu||_{TV}=\text{Max}_{A\subset S}|\mu(A)-\nu(A)|$
@@ -746,25 +839,32 @@ We can define a distance metric between two distributions defined as the three e
 - $||\mu - \nu||_{TV}=\text{inf}\{P(X\neq Y): (X,Y)\text{is a coupling of }\mu\text{ and }\nu\}$
 
 Its nice having all of these definitions because we can just pick the one that is most convenient for our use-case. 
-The third definition of TV distance is nice because any coupling you create will be an upper bound on the TV distance. Thus if we can be clever about our couplings we can bound the total variation and the mixing time. A coupling of two random variables $X$ and $Y$ is a joint random variable such that the marginal of $X$ is $\mu$ and the marginal of $Y$ is $\nu$. 
-We always have the independent coupling but we can get clever and make better ones that are not independent. 
+The third definition of TV distance is nice because any coupling you create will be an upper bound on the TV distance. Thus if we can be clever about our couplings we can bound the total variation and the mixing time. A coupling of two random variables $X$ and $Y$ is a joint random variable such that the marginal of $X$ is $\mu$ and the marginal of $Y$ is $\nu$. AKA just looking at a single one will look like a normal Markov Chain when looking at its marginal 
+We always have the independent coupling but we can get clever and make better ones that are not independent 
 
 
 The maximal distance to stationary is defined as $d(t) = \text{Max}_{j\in S}||\pi_{x_0=j}^{(t)}-\pi||_{TV}$. The mixing time of a Markov Chain is defined as $t_{\text{mix}}(\epsilon)=\text{min}\{t|d(t)\leq \epsilon\}$
 
-### Coupling Methods for mixing times
+### Techniques for calculating mixing times 
+
+#### Coupling Method
 A coupling of Markov Chains is defined as pair of stochastic processes $(X_{t},Y_{t})$ where both processes follow the same transition matrix $P$ but can start at different initial conditions.
 
 We know that $||\pi_{x}^{(t)}-\pi_{y}^{(t)}||_{\text{TV}}\leq P(X_{t}\neq Y_{t})$ because every step of the stochastic process is a valid coupling of $\pi_{x}^{(t)}$ and $\pi_{y}^{(t)}$. 
 
-We can always do the independent coupling, but in the case of a lazy random walk(a random walk with a $50\%$ of staying in the same location) we can define a better coupling. We can flip a coin and randomly pick who advances, with the one who doesn't advance staying in the same state. 
-Additionally we add the condition that once they equal each other, they always equal each other transitioning together. This massively decreases $P(X_{t}\neq Y_{t})$ as overtime it becomes smaller and smaller.
-
+Additionally we can add the condition that once they equal each other, they always equal each other transitioning together. This massively decreases $P(X_{t}\neq Y_{t})$ as overtime it becomes smaller and smaller. This is a valid coupling because if they were the same then they would still individually be transitioning like a normal Markov Chain 
 
 The coupling time denoted $\tau_{t}=\text{min}\{t\geq 0:X_{t}=Y_{t}|X_{0}=i,Y_{0}=j\}$ 
 We get another bound of $||X_{i}^{(t)}-X_{j}^{(t)}||_{\text{TV}}\leq P(\tau_t>t)$. 
 
 Also know that $d(t)\leq\text{Max}_{i,j\in S}||\pi_{X_0=i}^{(t)}-X_{Y_{0}=j}^{(t)}||_{\text{TV}}$ 
+
+### Applications of Mixing times
+Here a just a few examples of calculating independent mixing times 
+#### Shuffling Cards(Coupling)
+Here shuffling means taking a random card and then moving it to the top of the deck. For our coupling we have two decks $X$ and $Y$, each one starting in random permutations. Then we select a random card from $X$ and move it to the top, and also take the same random card in deck $Y$ and then move it to the top. 
+Importantly this is a valid coupling because just looking at $X$ or $Y$ it seems like a standard Markov Chain(because each each card moves to the top with probability $\frac{1}{n}$), but they will slowly converge to each other. 
+Now its kinda easy to see that once cards match, they will match forever 
 
 
 
