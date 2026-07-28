@@ -840,10 +840,9 @@ We can define a distance metric between two distributions defined as the three e
 
 Its nice having all of these definitions because we can just pick the one that is most convenient for our use-case. 
 The third definition of TV distance is nice because any coupling you create will be an upper bound on the TV distance. Thus if we can be clever about our couplings we can bound the total variation and the mixing time. A coupling of two random variables $X$ and $Y$ is a joint random variable such that the marginal of $X$ is $\mu$ and the marginal of $Y$ is $\nu$. AKA just looking at a single one will look like a normal Markov Chain when looking at its marginal 
-We always have the independent coupling but we can get clever and make better ones that are not independent 
+We always have the independent coupling but we can get clever and make better ones that are not independent.
 
-
-The maximal distance to stationary is defined as $d(t) = \text{Max}_{j\in S}||\pi_{x_0=j}^{(t)}-\pi||_{TV}$. The mixing time of a Markov Chain is defined as $t_{\text{mix}}(\epsilon)=\text{min}\{t|d(t)\leq \epsilon\}$
+The interesting thing is that as the chain goes on longer the total variation distance between the chain and the stationary distribution is always decreasing monotonically. Which makes all our math way nicer. 
 
 ### Techniques for calculating mixing times 
 
@@ -859,13 +858,28 @@ We get another bound of $||X_{i}^{(t)}-X_{j}^{(t)}||_{\text{TV}}\leq P(\tau_t>t)
 
 Also know that $d(t)\leq\text{Max}_{i,j\in S}||\pi_{X_0=i}^{(t)}-X_{Y_{0}=j}^{(t)}||_{\text{TV}}$ 
 
+#### Geometric Convergence
+This is a super easy method for use when it comes to finding mixing times. It works well when you have some element that is connected to every other element. It formally states if $P$ is your transition matrix, and $m_j$ is the smallest element in the $j$th column. Finally if we let $m=\Sigma_{j}m_j$ then we have 
+$$
+||p^{t}_{x}-\pi||\leq(1-m)^{t}
+$$
+This comes from the trivial coupling exp
+
+
 ### Applications of Mixing times
 Here a just a few examples of calculating independent mixing times 
 #### Shuffling Cards(Coupling)
 Here shuffling means taking a random card and then moving it to the top of the deck. For our coupling we have two decks $X$ and $Y$, each one starting in random permutations. Then we select a random card from $X$ and move it to the top, and also take the same random card in deck $Y$ and then move it to the top. 
 Importantly this is a valid coupling because just looking at $X$ or $Y$ it seems like a standard Markov Chain(because each each card moves to the top with probability $\frac{1}{n}$), but they will slowly converge to each other. 
-Now its kinda easy to see that once cards match, they will match forever 
+Now its kinda easy to see that once cards card positions match they will match forever, thus $P(X= Y)$ is bounded by the probability that all the cards have been selected which is the coupon collectors problem, with number of coupons being the number of cards in the deck.
+We know that if the Markov Chain runs for $n\ln n + cn$ steps than the probability that a specific card would not be moved is $(1-\frac{1}{n})^{n\ln n +cn}\leq e^{-(\ln n +c)}=\frac{e^{-c}}{n}$ by using the classic $e$ approximation. Then by union bound we see that the probability a card has not been moved to the top is at most $e^{-c}$. But we don't want our answer to be in terms of $c$ we want it to be in terms of epsilon so we solve using $e^{-c}=\epsilon$ which solving for $c$ gives us $c=\ln(1/\epsilon)$ which when we plug that back into $n \ln n + cn$ we get $n \ln n + c\ln(1/\epsilon)=n\ln(n/\epsilon)$ steps we have a total variation distance at most. 
+so if we wanted a $0.05$ total variation distance with a $52$ card deck we would need to take $52\ln(52/0.05)=366$ steps 
 
+#### Random Hypercube Vertex(Coupling)
+This algorithm is very similar to the previous algorithm with the shuffling of the deck. If we start at some vertex of a hypercube and then want to generate a uniformly random hypercube vertex. We can define two random walks one $X$ and one $Y$. We have $X$ move by picking a random bit $x_i$ and then setting that bit equal to $0$ with probability $50\%$ and set it to $1$ with probability $50\%$. Then we set the random walk $Y$ $i$th bit to the same bit.
+This is another example of the coupons collectors problem for coupling so the math is exactly identical. For an $n$ dimension hypercube, there are $n$ bits(thus $n$ coupons to collect) meaning that the mixing time is bounded by $n\ln(n/\epsilon)$ 
+
+#### Random Independent Set of Fixed Size(Coupling)
 
 
 ### Spectral Methods for mixing times
