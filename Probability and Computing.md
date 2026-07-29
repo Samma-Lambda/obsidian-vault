@@ -880,7 +880,15 @@ This algorithm is very similar to the previous algorithm with the shuffling of t
 This is another example of the coupons collectors problem for coupling so the math is exactly identical. For an $n$ dimension hypercube, there are $n$ bits(thus $n$ coupons to collect) meaning that the mixing time is bounded by $n\ln(n/\epsilon)$ 
 
 #### Random Independent Set of Fixed Size(Coupling)
+Since we are interested in sampling a specific size of independent set, our algorithm for independent set generation needs to be changed. Here is our new algorithms
+1. Start with some random independent set $X_i$
+2. Then you pick a random uniform random vertex $v\in X_i$ and then a random vertex $w$ in the graph. If $(X_i-\{v\})\cup \{w\}$ then we set that state to be $X_{i+1}$, otherwise we set $X_{i+1}=X_i$ 
+If we let $n$ be the number of vertices and $\Delta$ be the maximum degree of all the vertices. 
 
+Let $X_t$ and $Y_t$ be two of these random walks. For all $t$ we define a function $M$ from the vertices of $X_t-Y_t$ to $Y_t-X_t$ because $X_t$ and $Y_t$ are the same cardinality $|X_t-Y_t|=|Y_t-X_t|$. Thus we can define a bijection between these two sets. An example for a function $M$ might be labelling every vertex and then matching the vertices in sorted order IE $\{0,4,5\}$ to $\{1,9,12\}$.
+
+We have $X_t$ transition as normal selecting a vertex $v\in X_t$ and $w$ in the graph and transitioning if swapping $v$ and $w$ would result in a still independent graph which we will denote $m(v,w,Y_t)$.
+If $v\in Y_t$ then we attempt the move $m(v,w,Y_t)$. If $v\not\in Y_t$ then we attempt the move $m(M(v),w,Y_t)$  
 
 ### Spectral Methods for mixing times
 We know the following facts about the transition matrix $P$ of a Markov Chain 
