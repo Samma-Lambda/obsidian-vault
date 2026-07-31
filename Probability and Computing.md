@@ -859,7 +859,7 @@ We get another bound of $||X_{i}^{(t)}-X_{j}^{(t)}||_{\text{TV}}\leq P(\tau_t>t)
 Also know that $d(t)\leq\text{Max}_{i,j\in S}||\pi_{X_0=i}^{(t)}-X_{Y_{0}=j}^{(t)}||_{\text{TV}}$ 
 
 #### Geometric Convergence
-This is a super easy method for use when it comes to finding mixing times. It works well when you have some element that is connected to every other element. It formally states if $P$ is your transition matrix, and $m_j$ is the smallest element in the $j$th column. Finally if we let $m=\Sigma_{j}m_j$ then we have 
+This is a super easy method for use when it comes to finding mixing times. It works well when you have some element that is connected to every other element. It formally states if $P$ is your transition matrix, and $m_j$ is the smallest element in the $j$th column(meaning any the smallest probability of going to state $j$ from any state is $m_j$). Finally if we let $m=\Sigma_{j}m_j$ then we have 
 $$
 ||p^{t}_{x}-\pi||\leq(1-m)^{t}
 $$
@@ -882,13 +882,21 @@ This is another example of the coupons collectors problem for coupling so the ma
 #### Random Independent Set of Fixed Size(Coupling)
 Since we are interested in sampling a specific size of independent set, our algorithm for independent set generation needs to be changed. Here is our new algorithms
 1. Start with some random independent set $X_i$
-2. Then you pick a random uniform random vertex $v\in X_i$ and then a random vertex $w$ in the graph. If $(X_i-\{v\})\cup \{w\}$ then we set that state to be $X_{i+1}$, otherwise we set $X_{i+1}=X_i$ 
-If we let $n$ be the number of vertices and $\Delta$ be the maximum degree of all the vertices. 
+2. Then you pick a random uniform random vertex $v\in X_i$ and then a random vertex $w$ in the graph. If $(X_i-\{v\})\cup \{w\}$ is an independent set and $w\not\in X_i$ then we set $X_{i+1}=(X_i-\{v\})\cup \{w\}$, otherwise we set $X_{i+1}=X_i$ 
+If we let $n$ be the number of vertices, $\Delta$ be the maximum degree of all the vertices and $k$ be the size our our independent set. This chain is rapidly mixing when $k\leq n(3\Delta+3)$ 
 
 Let $X_t$ and $Y_t$ be two of these random walks. For all $t$ we define a function $M$ from the vertices of $X_t-Y_t$ to $Y_t-X_t$ because $X_t$ and $Y_t$ are the same cardinality $|X_t-Y_t|=|Y_t-X_t|$. Thus we can define a bijection between these two sets. An example for a function $M$ might be labelling every vertex and then matching the vertices in sorted order IE $\{0,4,5\}$ to $\{1,9,12\}$.
 
 We have $X_t$ transition as normal selecting a vertex $v\in X_t$ and $w$ in the graph and transitioning if swapping $v$ and $w$ would result in a still independent graph which we will denote $m(v,w,Y_t)$.
-If $v\in Y_t$ then we attempt the move $m(v,w,Y_t)$. If $v\not\in Y_t$ then we attempt the move $m(M(v),w,Y_t)$  
+If $v\in Y_t$ then we attempt the move $m(v,w,Y_t)$. If $v\not\in Y_t$ then we attempt the move $m(M(v),w,Y_t)$ . Its easy to see that once these chains equal each other they will stay the same forever. 
+
+To find the probability of $X_t\neq Y_t$ be are gonna look at the behavior of $d_t=|X_t-Y_t|$ over time. 
+
+Suppose that $d_t>0$ then in order for $d_{t+1}=d_t+1$ we need that $v\in X_t\cap Y_t$ and $w$ must only be acceptable to one of the chains(cause then one acquires it ). Thus it must be in the set $w\in(X_t-Y_t)\cup(Y_t-X_t)$ or a neighbor of the set. The probability of $v\in X_t\cap Y_t$ is $\frac{k-d_t}{k}$, and the probability of selecting a vertex $w$ with the previous condition is $\frac{\text{vertices in }(X_t-Y_t)\cup(Y_t-X_t)+\text{neighbors of }(X_t-Y_t)\cup(Y_t-X_t)}{\text{total vertices in the whole graph}}=\frac{2d_t+2d_t(\Delta)}{n}=\frac{2d_t(\Delta+1)}{n}$. Thus we know that $P(d_{t+1}=d_t+1|d_t>0)\leq \frac{k-d_t}{k}\frac{2d_t(\Delta+1)}{n}$ 
+
+Again supposing that $d_t>0$ in order for $d_{t+1}=d_t-1$ we need $v\in X_t-Y_t$ which forces $Y_t$ to pick $v^{\prime}\in Y_t-X_t$. This happens with probability $\frac{d_t}{k}$. Then we need to pick a $w$ such that  
+
+
 
 ### Spectral Methods for mixing times
 We know the following facts about the transition matrix $P$ of a Markov Chain 
