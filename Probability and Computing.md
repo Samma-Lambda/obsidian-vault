@@ -3,6 +3,11 @@ tags:
 ---
 #domain 
 This is the study of how utilizing probability can lead to computational advantages
+
+Things to finish:
+Parrondos paradox
+Queueing theory
+Independent set proofs 
 # Chapter 1: Introduction to Probability 
 In this chapter they introduce basic concepts like the axioms of probability, bayes rule and LOTP. I don't feel the need to go into detail 
 ## Types of Randomized Algorithms
@@ -832,6 +837,7 @@ Within this we study things like
 $\Delta_x(t)=||p^{t}_x-\bar{\pi}||$ which is the total variation distance between the Markov Chain starting at state $x$ and the stationary distribution. $\Delta(t)=\text{Max}_{x\in S}\Delta_x(t)$ is known as the maximal distribution. It tells us how close to random we are. 
 
 Then we also care about $\tau_x(\epsilon)=\text{min}\{t:\Delta_x(t)\leq \epsilon \}$ and $\tau(\epsilon)=\text{Max}_{x\in S}\tau_x(\epsilon)$ which is a function of the total variation distance that returns the number of steps that we need to get within epsilon of random.  
+There is a pretty powerful theorem which says that if $\tau(c)\leq T$ for some $c<1/2$ then we can find all of the other mixing times $\tau(\epsilon)\leq\lceil\ln\epsilon/\ln(2c)\rceil T$ meaning finding the bound for $\frac{1}{2}$ is really the only important thing    
 ### Total Variation Distance
 We can define a distance metric between two distributions defined as the three equivalent definitions
 - $||\mu - \nu||_{TV}=\text{Max}_{A\subset S}|\mu(A)-\nu(A)|$
@@ -863,7 +869,7 @@ This is a super easy method for use when it comes to finding mixing times. It wo
 $$
 ||p^{t}_{x}-\pi||\leq(1-m)^{t}
 $$
-This comes from the trivial coupling exp
+This comes from the coupling where you can think of it is at as the two Markov Chains $X_t$ and $Y_t$ both transitioning to state $x$ with probability $m_j$. Since this can happen for all states we add them all up together 
 
 
 ### Applications of Mixing times
@@ -894,37 +900,239 @@ To find the probability of $X_t\neq Y_t$ be are gonna look at the behavior of $d
 
 Suppose that $d_t>0$ then in order for $d_{t+1}=d_t+1$ we need that $v\in X_t\cap Y_t$ and $w$ must only be acceptable to one of the chains(cause then one acquires it ). Thus it must be in the set $w\in(X_t-Y_t)\cup(Y_t-X_t)$ or a neighbor of the set. The probability of $v\in X_t\cap Y_t$ is $\frac{k-d_t}{k}$, and the probability of selecting a vertex $w$ with the previous condition is $\frac{\text{vertices in }(X_t-Y_t)\cup(Y_t-X_t)+\text{neighbors of }(X_t-Y_t)\cup(Y_t-X_t)}{\text{total vertices in the whole graph}}=\frac{2d_t+2d_t(\Delta)}{n}=\frac{2d_t(\Delta+1)}{n}$. Thus we know that $P(d_{t+1}=d_t+1|d_t>0)\leq \frac{k-d_t}{k}\frac{2d_t(\Delta+1)}{n}$ 
 
-Again supposing that $d_t>0$ in order for $d_{t+1}=d_t-1$ we need $v\in X_t-Y_t$ which forces $Y_t$ to pick $v^{\prime}\in Y_t-X_t$. This happens with probability $\frac{d_t}{k}$. Then we need to pick a $w$ such that  
+Again supposing that $d_t>0$ in order for $d_{t+1}=d_t-1$ we need $v\in X_t-Y_t$ which forces $Y_t$ to pick $v^{\prime}\in Y_t-X_t$. This happens with probability $\frac{d_t}{k}$. Then we need to pick a $w$ such that  it is neither an element of nor a neighbor of $X_t\cup Y_t-\{v,v^{\prime}\}$. Since the set $X_t\cup Y_t$  has cardinality $k+d_t$ thus the probability that the correct vertex is selected is $\frac{n-(k+d_t-2)(\Delta+1)}{n}$ since there are $(k+d_t-2)(\Delta+1)$ neighbors and elements of the set. Thus $P(d_{t+1}=d_t-1|d_t>0)\geq \frac{d_t}{k}\frac{n-(k+d_t-2)(\Delta+1)}{n}$ 
+
+Thus it is $d_t>0$ we see that $E[d_{t+1}|d_t]=d_t+P(d_{d+1}=d_t+1)-P(d_{t+1}=d_t-1)$ which is less than $d_t+\frac{k-d_t}{k}\frac{2d_t(\Delta+1)}{n}-\frac{d_t}{k}\frac{n-(k+d_t-2)(\Delta+1)}{n}$ which can be arranged to be $d_t(1-\frac{n-(3k-d_t-2)(\Delta+1)}{kn})$ which since $d_t$ is more than $0$ we just set it to be $1$ thus we get that it is less than  $d_t(1-\frac{n-(3k-3)(\Delta+1)}{kn})$. Beyond that once the $d_t=0$ the chains follow the same path thus $E[d_{t+1}|d_t=0]=0$ 
+
+Then using law of total expectation we get that $E[d_{t+1}]=E[E[d_{t+1}|d_t]]\leq E[d_t(1-\frac{n-(3k-3)(\Delta+1)}{kn})]\leq E[d_t](1-\frac{n-(3k-3)(\Delta+1)}{kn})$ then by using this inequality repeatedly we get $E[d_t]\leq d_0(1-\frac{n-(3k-3)(\Delta+1)}{kn})^t$   
+
+Since we know that $d_0$ is less than $k$(since the size of the set is $k$ they can only differ by $k$). Thus we get that 
+$$
+	P(d_t\ge 1)\le E[d_t]\le k(1-\frac{n-(3k-3)(\Delta+1)}{kn})^t\le ke^{-t(n-(3k-3)(\Delta+1))/(kn)}
+$$
+which means it converges to zero when $k\leq n/(3\Delta +3)$, thus the mixing time is 
+$$
+\tau(\epsilon)\le\frac{kn\ln(ke^{-1})}{n-(3k-3)(\Delta+1)}
+$$
+which we can see is polynomial in $n$ and $\ln(1/\epsilon)$ thus is rapidly mixing 
 
 
 
-### Spectral Methods for mixing times
-We know the following facts about the transition matrix $P$ of a Markov Chain 
-- If $\lambda$ is an eigenvalue of $P$ then $|\lambda|\leq 1$ 
-- If $P$ is irreducible then $\lambda=1$ has an eigenspace of $\vec{1}$
-- If $P$ is irreducible and aperiodic then it does not have $-1$ as an eigenvalue 
 
-We can define a new inner product space $(\mathbb{R}^n,<.,.>_{\pi})$. Where $<f,g>_{\pi}=\Sigma_{x\in S}f_x g_x \pi_x$
 
-If our Markov Chain is reversible with respect to $\pi$ then then the following is true
-- $(\mathbb{R}^n,<.,.>_{\pi})$ has an orthonormal basis of eigenvectors $f^{k}$ with associated real eigenvalues $\lambda_k$
-- $P$ can be decomposed into $\frac{p_{ij}^{(t)}}{\pi_{j}}=\Sigma_{k=1}^{n}f_{i}^{k}f_{j}^{k}\lambda_{k}^{t}$
+#### Proper Colorings(Coupling)
+A vertex coloring is taking a graph and then assigning a color to each vertex and no adjacent vertices share a color. Our algorithm works when there are $4\Delta + 1$ coloring where $\Delta$ is the maximum degree any vertex in the graph 
 
-We have something called the separation distance $s(t)=\text{Max}_{j}[1-\frac{p_{ij}^{(t)}}{\pi_{j}}]$ 
+The walk is very simple, it starts with some coloring and then pick some vertex $v$ and then change it to a random color. If it is a valid coloring then you set that new coloring to the new state, otherwise you will keep in the previous state. 
 
-We have another bound $||\pi^{(t)}_{X_0=i}-\pi||_{\text{TV}}\leq s(t)$ 
+We want this to converge to a random uniform stationary so we need it to be a aperiodic and irreducible. Since every state has a chance of self transition the chain is aperiodic. Additionally if $c>\Delta + 2$ it is irreducible, we can construct a path between any two colorings. Take the graph and provide some ordering on them, then if the first one disagrees change it so they do agree. If this is not possible then there exists some neighbor who has the color we want it to be. Since there are $\Delta+2$ colors we can change this neighbor to a new non-conflicting color and then change the node we wanted. We then do this on the second node. This terminates and creates a path.  
 
-$\lambda_{*}=\text{Max}\{|\lambda_k|:\lambda_{k}\text{ is an eigenvalue and }\lambda_{k}\neq 1\}$ we define the absolute spectral gap as $\gamma_{*}=1-\lambda_{*}$
+Now we are going to prove that for a graph with $n$ vertices and maximum degree $\Delta$ the mixing time of the graph coloring Markov chain satisfies $\tau(\epsilon)\leq\lceil\frac{nc}{c-4\Delta}\ln(\frac{n}{\epsilon})\rceil$ given that $c\geq 4\Delta+1$ 
+##### Proof
+This proof has a similar structure to the proof of independent sets of a fixed size. We let $D_t$ be the set of vertices different at time $t$, and $d_t=|D_t|$.
 
-The relaxation time is defined as $\frac{1}{\gamma_{*}}$
-We get another bound of $t_{\text{mix}}(\epsilon)\leq t_{\text{rel}}\log(\frac{1}{\epsilon \pi_{\text{min}}})$ 
+At any give point $d_t$ can increase by $1$, decrease by $1$ or stay the same value. 
 
-GOOD PROOFS TO DO
-- $d(t+1)\leq d(t)$
-- DBE implies stationary 
-- Proof TV is a distance metric 
-- Prove equivalent definitions of TV distance 
+Given a vertex $v$ colored colored differently by the two chains, since the degree of $v$ is at most $\Delta$ there are at least $c-2\Delta$ colors that are not touching the vertex $v$. So we need to randomly pick one of those valid colors which happens with probability $\frac{c-2\Delta}{c}$. And we need to randomly pick one of these vertexes which happens with probability $\frac{d_t}{n}$. Thus
+$$
+P(d_{t+1}=d_t-1|d_t>0)\ge \frac{d_t}{n}
+\frac{c-2\Delta}{c}$$
+Now if we look at a vertex $v$ that is the same for both chains, in order for them to stop matching one needs to switch and the other needs to be invalid for the color we want to switch. Since this requires the chosen node to have different colored neighbors there are $\frac{\Delta d_t}{n}$ spots and $\frac{2}{c}$ colors thus 
+$$
+P(d_{t+1}=d_t+1|d_t>0)=\frac{\Delta d_t}{n}\frac{2}{c}
+$$
+from this we can get $E[d_{t+1}|d_t]=d_t+P(d_{t+1}=d_t+1|d_t>0)-P(d_{t+1}=d_t-1|d_t>0)$ which is less than $d_t+\frac{\Delta d_t}{n}\frac{2}{c}-\frac{d_t}{n}\frac{c-2\Delta}{c}=d_t(1-\frac{c-4\Delta}{nc})$ which similar to the previous proof we can get $E[d_{t+1}]=E[E[d_{t+1}|d_t]]\le E[d_t](1-\frac{c-4\Delta}{nc})$ which by induction gives us $E[d_t]\le d_0(1-\frac{c-4\Delta}{nc})$ which doing the exact thing from last proof we get   $P(d_t\ge 1)\le E[d_t]\le n(1-\frac{c-4\Delta}{nc})^t\le ne^{-t(c-4\Delta)/nc}$ which proves our conjecture showing that the TV distance is at most 
+$$
+\tau(\epsilon)\leq\lceil\frac{nc}{c-4\Delta}\ln(\frac{n}{\epsilon})\rceil
+$$
 
+##### Refined Proof for $c\geq 2\Delta+1$ 
+
+But we can further refine this proof to state that  $\tau(\epsilon)\leq\lceil\frac{nc}{c-4\Delta}\ln(\frac{n}{\epsilon})\rceil$ given that $c\geq 2\Delta+1$. 
+
+Again we define $D_t$ as the set of vertices which have different colors at time $t$, with $|D_t|=d_t$. Also define $A_t$ to be the set of vertices which have the same color across the two chains at time $t$. For a vertex $v\in A_t$ let $d^{\prime}(v)$ be the number of vertices that are adjacent to $v$ which are in $D_t$. Same with $w\in D_t$ have $d^{\prime}(w)$ be the number of vertexes in next to $w$ which are in $A_t$. Note that 
+$$
+\Sigma_{v\in A_t}d^{\prime}(v)=\Sigma_{w\in D_t}d^{\prime}(w)=m^{\prime}
+$$
+Since each edge that connects one set to another adds one to each set. 
+
+Now we define a new coupling if we randomly select $v\in D_t$ we do the same exact process as before. Thus when we pick a vertex in $D_t$ and then select the random color that is not neighbors of either. The probability of this for a specific vertex is at least $P(d_{t+1}=d_t-1)=\frac{1}{n}\Sigma_{v\in D_t}\frac{c-2\Delta+d^{\prime}(v)}{c}=\frac{1}{cn}((c-2\Delta)d_t+m^{\prime})$  which works because there are $d_t$ elements in $D_t$
+
+But if $v\in A_t$ we change how the coupling works from the previous solution. If we select something in $A_t$ then there are $2d^{\prime}(v)$ colors that could be selected that result in the distance increasing. So instead we define $S_1(v)$ and $S_2(v)$ which are the set of colors on the $n$th chain but not the other chain. We then define a bijection between them such that $c_1\in S_1(v)$ is chosen then a corresponding $c_2\in S_2(v)$ thus the total ways to color the chains that increases $d_t$ is at most $\text{Max}(|S_1(v)|,|S_2(v)|)\leq d^{\prime}(v)$ thus we know that 
+$$
+P(d_{t+1}=d_t+1)=\frac{1}{n}\Sigma_{v\in A_t}\frac{d^{\prime}(v)}{c}=\frac{m^{\prime}}{cn}
+$$
+which then we do pretty much the exact same thing we did in the previous proof and get 
+$$\tau(\epsilon)\leq\lceil\frac{nc}{c-4\Delta}\ln(\frac{n}{\epsilon})\rceil$$
+
+
+
+
+
+
+
+
+#### Independent Sets(Path Coupling)
+We can construct a Markov Chain which will give us uniformly independent sets for maximum degree $\Delta\le 4$ the chain works using the following. Start with some independent set then select some random edge in the graph.
+- With probability $\frac{1}{3}$ set $X_{t+1}=X_t-\{u,v\}$ 
+- With probability $\frac{1}{3}$ set $X_{t+1}=(X_t-\{u\})\cup \{v\}$ if that is a valid independent set, otherwise set $X_{t+1}=X_t$ 
+- With probability $\frac{1}{3}$ set $X_{t+1}=(X_t-\{v\})\cup \{u\}$ if that is a valid independent set, otherwise set $X_{t+1}=X_t$ 
+
+We are using a new technique of path coupling which I don't fully understand yet. We initialize the Markov chains to state $X_t=I$ and $Y_t=I\cup \{x\}$, and define the distance between them to be $d_t=|X_t-Y_t|+|Y_t-X_t|$. Note since they are transitioning the same the only way that $d_t$ increases is if a move is selected that involves $x$. 
+
+We call the vertices in only one $X_t$ or $Y_t$ bad vertices and the other vertices good. Then $\delta_z=1$ if $z\neq x$ if vertex $z$ goes from good to bad, likewise $\delta_z=-1$ if it goes from bad to good on step $t$ to step $t+1$. From this we get 
+$$
+E[d_{t+1}-d_t|d_t=1]=E[\Sigma\delta_w|d_t=1]=\Sigma E[\delta_w|d_t=1]
+$$
+which is from linearity of expectation. 
+
+Now assume that $x$ has $k$ neighbors, and lets denote one of the neighbors $y$. We can breakdown this into three cases
+1. Let $y$ have two or more neighbors in the independent set $I=X_t$. 
+Then no move involving $y$ can increase the number of bad vertices because no matter what edge you pick the other neighbor would always make it invalid thus in this cases $d_{t+1}$ be greater than $d_t$ 
+2. Assume that $y$ has no neighbors in $I=X_t$ 
+Then $d_t$ can only increase by $1$ if edge $(y,z_i)$ with $i\in{1,2,3}$(because one of the neighbors is $x$) and the move decides to add $y$ and remove $z_i$. This would work on $X$ but it would not work on $Y$ because $x$ is the neighbor of $y$. But there are three different cases when we select $y$ and $z_i$, and only the one which adds $y$ increases the $d_t$. Thus the probability of increase is the number of $z_i$ times $\frac{1}{3}$(because of the three choices) times the number of edges $3\cdot\frac{1}{3}|E|=1/|E|$ chance of increasing $d_t$. 
+But similarly there are an equal number of moves which decrease $d_t$ by adding $y$ to $X_t$ 
+3. Assume $y$ has one neighbor in $I=X_t$ 
+If the edge $(x,y)$ is chosen then two moves decrease $d_t$ by $1$ if both $x$ and $y$ are removed(because $X$ does not have $y$) and the move which removes $y$ and adds $x$($y$ is not present and $x$ is different between them so this fixes it)
+Let $z$ be the neighbor of $Y$ in $I$. If the edge $(y,z)$ and $y$ is attempted to be added then $z$ is attempted to be removed. Since this move can't be done(its invalid in $Y$) then $d_t$ increased by $2$. No other move increases $d_t$ 
+These two cases cancel each other out leading the expected value of this case of be $0$ 
+
+Thus since all the moves which increase values get canceled out, the following we know is true $E[d_{t+1}-d_t|d_t=1]\le 0$ 
+
+We then are able to use this case repeatedly and it shows the chain allows for rapid mixing. Still need to find the exact polynomial but taking a break for now 
+
+
+
+
+
+
+
+
+# Chapter 13: Martingales 
+Martingales are a form of random walk where the expected value of the next step is the value of the previous step. Often people explain this using fair games of chance, but they actually generalize very well with the use of doob martingales which tell us how our beliefs change when new information is revealed 
+## Martingale
+A sequence of random variables $Z_0,Z_1,...,Z_n$ is a martingale with respect to the sequence of random variables $X_0,X_1,...,X_n$ if the following conditions hold 
+- $Z_n$ if a function of $X_0,X_1,...,X_n$ 
+- $E[|Z_n|]<\infty$ 
+- $E[Z_{n+1}|X_0,...,X_n]=Z_n$ 
+Further a sequence of random variables can be a martingale with respect to itself. An example of this would be if $X_i$ was the amount a gambler won on the $i\text{th}$ round, then we could define a martingale $Z_i$ which is the sum of the earning at time $i$
+## Doob Martingale 
+A doob martingale is a common framework for a martingale that applies to a large number of situations, often when how aqquiring . 
+It works where you have some sequence of random variables $X_0,X_1,...,X_n$ and have $Y$ be some random variable(with $E[|Y|]<\infty$) which is dependent on those random variables. Then we define 
+$$
+Z_i=E[Y|X_0,...,X_i]
+$$
+Note that this works because conditional expectation is a random variable. An example of this would be the edge exposure martingale, where every edge is either present or not based of $X_i$ using some way of enumerating the edges. Then $Y$ would be the biggest cycle and $Z_i$ is the predicted value of the biggest cycle
+## Stopping Times
+A stopping time is a random variable such that the probability of $T=n$ is independent of $Z_i, \forall i > n$. Most of the time a stopping time is the first time something happens, for example the first time you get three wins in a row. Often we have a martingale $Z_i$ which we will denote the time which the stopping time happens as $Z_T$ where the index actually is a random variable
+
+## Martingale Stopping Theorem
+Even the textbook does not include the proof for this but it states the following for a martingale $Z$ and stopping time of the martingale $T$ then 
+$$
+E[Z_T]=E[Z_0]
+$$
+If one of the following is true 
+- $Z_i$ is bounded meaning that for all $i$ $|Z_i|\leq c$ 
+- $T$ is bounded 
+- $E[T]<\infty$ and there is some constant $c$ such that $E[|Z_{i+1}-Z_i|X_1,...,X_i]<c$ 
+This essentially allows you to look down the line and get the expected value of that point
+### Gamblers Ruin
+We can easily see that the gamblers ruin problem is a martingale(specifically the amount of money a specific player has won/lost). We define the stopping time of the gamblers ruin as the first time the player has won either $l_1$ or lost $l_2$ dollars.
+
+We can easily see that $Z_i$ is bounded because we are stopping once they have either lost or won money. Thus we know via the MST that $E[Z_T]=0$ thus meaning that $E[Z_T]=l_2 q-l_1 (1-q)$ which can be rearranged to prove $q=\frac{l_1}{l_1+l_2}$ 
+### Ballot Theorem
+This theorem says given candidate $A$ has received $a$ votes, and candidate $B$ has received $b$ votes with $a>b$. Then if you shuffle the order of votes to a uniform permutation, then count them the probability that candidate $A$ has more votes then $B$ the entire time is $\frac{(a-b)}{(a+b)}$. This can be proven using martingales. 
+
+If we have $n=a+b$ and then have $S_k$ be the number of votes candidate $A$ is leading by after the first $k$ votes are counted. Then we define a random variable 
+$$
+X_k=\frac{S_{n-k}}{n-k}
+$$
+Note that $X_0,X_1,X_2,...,X_{n-1}$ is a martingale. Now we are going to prove that it actually is a martingale. 
+We need to look at $E[X_k|X_0,...,X_{k-1}]$ note that conditioning on $X_0,...,X_{k-1}$ is the same as conditioning on $S_n,S_{n-1},...,S_{n-k+1}$. If we condition on $S_{n-k+1}$ then we know that candidate $A$ has 
+$$
+\alpha=\frac{n-k+1+S_{n-k+1}}{2}
+$$
+and candidate $B$ has 
+$$
+\beta=\frac{n-k+1-S_{n-k+1}}{2}
+$$
+The $n-k+1$th vote is random among these values. If it is $A$ then $S_{n-k}=S_{n-k+1}+1$ and minus $1$ if its $B$ therefore we can see that. We can find the expected value by noticing that 
+$$
+E[S_{n-k}|S_{n-k+1}]=(S_{n-k+1}+1)\frac{\alpha}{n-k+1}+(S_{n-k+1}-1)\frac{\beta}{n-k+1}=S_{n-k+1}\frac{n-k}{n-k+1}
+$$
+which since $E[X_k|X_0,...,X_{k-1}]=E[\frac{S_{n-k}}{n-k}|S_n,...,S_{n-k+1}]=\frac{S_{n-k+1}}{n-k+1}=X_{k-1}$ we see the last equality from expanding out the definition of $S_{n-k+1}$. But since $E[X_k|X_{k-1}]=X_{k-1}$ we know that our sequence is a martingale. 
+
+Now we want to use the martingale stopping time theorem to prove out conjecture. We define a stopping time as $T$ where it is the minimum $k$ such that $X_k=0$ or $T=n-1$ if there is no instance of this. This satisfies the property that $T$ is bounded, thus we can use the stopping theorem. Giving us 
+$$
+E[X_T]=E[X_0]=\frac{E[S_n]}{n}=\frac{a-b}{a+b}
+$$
+The last equality is true since $S_n=a-b$ and $n=a+b$ 
+
+Case 1: Candidate $A$ leads the whole time meaning that $S_{n-k}$ needs to be positive for all values, thus $T=n-1$. This means $X_T=X_{n-1}=\frac{S_{n-(n-1)}}{n-(n-1)}=\frac{S_1}{1}=S_1$ and since candidate $A$ is ahead the whole time $S_1=1$ thus $X_T=1$ 
+
+Case 2: Candidate $A$ does not lead the whole time. Thus $X_k=0$ equals zero at some point. Thus $T=k<n-1$ and $X_T=0$.
+
+Since we know $E[X_T]=\frac{a-b}{a+b}=1\cdot P(\text{Case 1})+0\cdot P(\text{Case 2})=1\cdot P(\text{Case 1})$ meaning the probability of case $1$ is $\frac{a-b}{a+b}$ 
+
+
+
+
+
+
+
+
+
+
+
+## Walds Equation 
+This equation allows us to more easily work when you are doing some random process repeatedly, and then have some random stopping time. It makes it easy when you repeatedly do some random process, a random amount of time. 
+It states if $X_1,X_2,...,X_n$ be iid random variables. Let $T$ be the stopping time of this sequence
+$$
+E[\Sigma_i^{T}X_i]=E[T]E[X]
+$$
+An easier way to think  about this is if the $T$ in the sum is a random variable. Thus if you do a random number of dice rolls uniformly $1-10$, Then you can easily calculate out the expected sum. 
+
+It is also useful in analyzing Las Vegas equations. Often they repeatedly do some process which takes a random amount of time, which succeeds with some random probability. 
+### Multiple Servers Single Channel
+Within this model we have $n$ servers all communicating through a shared channel. Time is broken up into discrete increments. If a single packet is sent and is the only packet in the time step, then it is processed. If more then two packets are sent in a time increment then they are stored in a buffer. Then the buffer at each time step attempts to send a packet in a time slot with probability $\frac{1}{n}$. Each server sends a packet with probability $\frac{1}{n}$. 
+
+We are interested in the time until every server has successfully sent a packet(Assuming the buffer starts with an infinite number of packets to simplify the calculation). Let $N$ be the number of packets sent before the first successful packet and let $t_i$ be the time slot in which the $i$th successful packet is sent with $t_0=0$ and $r_i=t_i-t_{i-1}$. 
+Then our goal is to find the value of the random variable $T=\Sigma_{i=1}^N r_i$. 
+
+$N$ is independent of the $r_i$ and since $E[N]<\infty$ thus $N$ is a stopping time for the sequence $r_i$. The probability that a packet is successfully sent in a given time slot is $p=\binom{n}{1}(\frac{1}{n})(1-\frac{1}{n})^{n-1}$ which is just the probability a server sends a packet, the probability no other servers send a packet, and the number of ways that can happen. This can be approximated as $e^{-1}$. The $r_i$ each have geometric distribution with param $p$ thus $E[r_i]=e$. NEED TO FIGURE OUT WHY THE $r_i$ ARE INDEPENDENT.
+
+Then we can easily see that the $N$ is the coupon collectors problem so its expected value $E[N]=nH(n)=n\ln(n)+O(n)$. Which gives us using the expected value of $E[T]=\frac{nH(n)}{p}$ 
+
+We also expect to hear from all the servers every $\frac{nH(n)}{p}$ time which roughly equals $e n\ln n$ 
+
+
+
+## Tail Inequalities for Martingales
+Tail inequalities provide bounds on the probability that a martingale exhibits some trait down the line, given there is some restriction on the on the step size of the martingale. The first example is the Azuma-Hoeffding Inequality 
+### Azuma-Hoeffding Inequality
+This provides a nice bound for how far a martingale can go from its starting value over time
+
+Let $X_0,X_1,...,X_n$ be a martingale such that
+$$
+|X_k-X_{k-1}|\leq c_k
+$$
+Then we know for all $t\geq 1$ and $\lambda >0$ 
+$$
+P(|X_t-X_0|\ge \lambda)\leq2e^{-\lambda/(2\Sigma_{i}^tc_k^2)}
+$$
+The proof of this is long and seems annoying so maybe I will do it at another point. 
+Also there is a simpler version of this where its the same $c$ for all steps. which gives us the bound 
+$$
+P(|X_t-X_0|\ge \lambda c\sqrt{t})\le 2e^{-\lambda^2/2}
+$$
+
+### McDiarmid's Inequality 
+This is a way to taking an arbitrary function which satisfies the Lipschitz condition with bound $c$, and shows that if you feed random variables into it then you will get an exponential drop off away from the mean. This if formalized as the following 
+$$
+P(f(X_1,...,X_n)-E[f(X_1,...,X_n)]\ge \lambda)\le 2 e^{-2\lambda^2/(nc^2)}
+$$
+### Applications of these inequalities 
+From these inequalities which we have aquired 
 
 
 # Useful Approximations and Bounds
